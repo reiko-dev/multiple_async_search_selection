@@ -1,3 +1,7 @@
+## 2.6.4 ✨ New parameter
+
+- Added the `minCharsToShowItems` parameter to `MultipleSearchController` to delay the search operation until the user has typed a minimum number of characters.
+
 ## 2.6.3 ⬆️ Bumps Flutter version
 
 - Due to the integration of the OverlayPortal feature, introduced in Flutter 3.10.0, the version constraints have been updated from `">=1.17.0"` to `">=3.10.0"`. This adjustment ensures compatibility with newer functionalities. Projects using versions of Flutter older than 3.10.0 and updating the library from versions 2.6.0 to 2.6.2 may encounter an '`OverlayPortalController' not found` error. It is recommended to update the Flutter environment to at least version `3.10.0` before applying this library update.
