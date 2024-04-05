@@ -1303,6 +1303,22 @@ class _MultipleSearchSelectionState<T>
     ];
   }
 
+  void _onSearchFieldChanged(String value) {
+    if (widget.controller?.minCharsToShowItems is int &&
+        value.length < widget.controller!.minCharsToShowItems!) {
+      showAllItems = false;
+      setState(() {});
+      return;
+    }
+    widget.onSearchChanged?.call(value);
+    showedItems = _searchAllItems(value);
+    if (widget.itemsVisibility == ShowedItemsVisibility.onType) {
+      showAllItems = widget.itemsVisibility == ShowedItemsVisibility.onType &&
+          _searchFieldTextEditingController.text.isNotEmpty;
+    }
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -1400,9 +1416,7 @@ class _MultipleSearchSelectionState<T>
                                     _searchField(
                                       maxItemsSelected: maxItemsSelected,
                                       onChanged: (value) {
-                                        widget.onSearchChanged?.call(value);
-                                        showedItems = _searchAllItems(value);
-                                        setState(() {});
+                                        _onSearchFieldChanged(value);
                                         stateSetter(() {});
                                       },
                                     ),
@@ -1514,17 +1528,7 @@ class _MultipleSearchSelectionState<T>
                   },
                   child: _searchField(
                     maxItemsSelected: maxItemsSelected,
-                    onChanged: (value) {
-                      widget.onSearchChanged?.call(value);
-                      showedItems = _searchAllItems(value);
-                      if (widget.itemsVisibility ==
-                          ShowedItemsVisibility.onType) {
-                        showAllItems = widget.itemsVisibility ==
-                                ShowedItemsVisibility.onType &&
-                            _searchFieldTextEditingController.text.isNotEmpty;
-                      }
-                      setState(() {});
-                    },
+                    onChanged: _onSearchFieldChanged,
                   ),
                 ),
               ),
@@ -1536,16 +1540,7 @@ class _MultipleSearchSelectionState<T>
             !widget.isOverlay) ...[
           _searchField(
             maxItemsSelected: maxItemsSelected,
-            onChanged: (value) {
-              widget.onSearchChanged?.call(value);
-              showedItems = _searchAllItems(value);
-              if (widget.itemsVisibility == ShowedItemsVisibility.onType) {
-                showAllItems =
-                    widget.itemsVisibility == ShowedItemsVisibility.onType &&
-                        _searchFieldTextEditingController.text.isNotEmpty;
-              }
-              setState(() {});
-            },
+            onChanged: _onSearchFieldChanged,
           ),
           if (showAllItems)
             Container(
@@ -1606,6 +1601,10 @@ class _MultipleSearchSelectionState<T>
 /// 5. clearAllPickedItems
 /// 6. selectAllItems
 class MultipleSearchController<T> {
+  MultipleSearchController({
+    this.minCharsToShowItems,
+  });
+
   Function()? clearSearchFieldCallback;
 
   Function()? clearAllPickedItemsCallback;
@@ -1617,6 +1616,9 @@ class MultipleSearchController<T> {
   List<T> Function(String)? searchItemsCallback;
 
   List<T> Function()? getPickedItemsCallback;
+
+  /// The minimum number of characters to type before showing items.
+  int? minCharsToShowItems;
 
   /// Clear all picked items.
   void clearAllPickedItems() {
