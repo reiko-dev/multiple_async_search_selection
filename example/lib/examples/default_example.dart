@@ -11,7 +11,8 @@ class DefaultConstructorExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MultipleSearchController<Country> controller = MultipleSearchController();
+    MultipleSearchController<Country> controller =
+        MultipleSearchController(minCharsToShowItems: 3);
     return Column(
       children: [
         MultipleSearchSelection<Country>(
