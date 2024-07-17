@@ -16,6 +16,7 @@ class CreatableConstructorExample extends StatelessWidget {
     return Column(
       children: [
         MultipleSearchSelection<Country>.creatable(
+          itemsVisibility: ShowedItemsVisibility.onType,
           searchField: TextField(
             decoration: InputDecoration(
               hintText: 'Search countries',
@@ -27,6 +28,9 @@ class CreatableConstructorExample extends StatelessWidget {
           createOptions: CreateOptions(
             create: (text) {
               return Country(name: text, iso: text);
+            },
+            validator: (country) {
+              return country.name.length > 2;
             },
             onDuplicate: (item) {
               log('Duplicate item $item');
