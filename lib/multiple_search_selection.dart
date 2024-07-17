@@ -838,6 +838,78 @@ class _MultipleSearchSelectionState<T>
     );
   }
 
+  Widget _buildShowedItems() {
+    return TapRegion(
+      onTapOutside: (event) {
+        if (widget.isOverlay) {
+          _overlayPortalController.hide();
+        }
+      },
+      child: ListView.builder(
+        padding: EdgeInsets.zero,
+        primary: false,
+        shrinkWrap: true,
+        cacheExtent: 900,
+        addAutomaticKeepAlives: false,
+        controller: _showedItemsScrollController,
+        itemCount: showedItems.isEmpty ? 1 : showedItems.length,
+        itemExtent: widget.showedItemExtent,
+        itemBuilder: (context, index) {
+          if ((showedItems.isEmpty && allItems.isNotEmpty) ||
+              (showedItems.isEmpty && allItems.isEmpty)) {
+            return (widget.isCreatable ||
+                        (widget.overlayOptions?.canCreateItem ?? false)) &&
+                    _searchFieldTextEditingController.text.isNotEmpty
+                ? GestureDetector(
+                    onTap: _onCreateItem,
+                    child: AbsorbPointer(
+                      child: widget.createOptions?.createBuilder(
+                            _searchFieldTextEditingController.text,
+                          ) ??
+                          widget.overlayOptions?.createOptions!.createBuilder
+                              .call(
+                            _searchFieldTextEditingController.text,
+                          ),
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: widget.noResultsWidget ??
+                        const Text(
+                          'No results',
+                        ),
+                  );
+          }
+
+          final item = showedItems[index];
+          return widget.isOverlay
+              ? GestureDetector(
+                  onTap: () async {
+                    _onAddItem(item);
+                  },
+                  child: AbsorbPointer(
+                    child: widget.itemBuilder(
+                      item,
+                      index,
+                    ),
+                  ),
+                )
+              : GestureDetector(
+                  onTap: () {
+                    _onAddItem(item);
+                  },
+                  child: AbsorbPointer(
+                    child: widget.itemBuilder(
+                      item,
+                      index,
+                    ),
+                  ),
+                );
+        },
+      ),
+    );
+  }
+
   Widget _overlayedShowedItems() {
     final renderBox =
         _searchFieldKey.currentContext?.findRenderObject() as RenderBox?;
@@ -962,6 +1034,11 @@ class _MultipleSearchSelectionState<T>
       return;
     }
 
+    if (pickedItems.contains(item) &&
+        !(widget.controller?.allowDuplicateSelection ?? true)) {
+      return;
+    }
+
     widget.onTapShowedItem?.call();
     final T pickedItem = item;
     pickedItems.add(pickedItem);
@@ -1006,6 +1083,9 @@ class _MultipleSearchSelectionState<T>
     if (widget.isCreatable) {
       final T itemToAdd =
           widget.createOptions!.create(_searchFieldTextEditingController.text);
+      if (!(widget.createOptions?.validator.call(itemToAdd) ?? false)) {
+        return;
+      }
 
       if (allItems.contains(itemToAdd) || pickedItems.contains(itemToAdd)) {
         widget.createOptions!.onDuplicate?.call(itemToAdd);
@@ -1142,78 +1222,6 @@ class _MultipleSearchSelectionState<T>
     }
   }
 
-  Widget _buildShowedItems() {
-    return TapRegion(
-      onTapOutside: (event) {
-        if (widget.isOverlay) {
-          _overlayPortalController.hide();
-        }
-      },
-      child: ListView.builder(
-        padding: EdgeInsets.zero,
-        primary: false,
-        shrinkWrap: true,
-        cacheExtent: 900,
-        addAutomaticKeepAlives: false,
-        controller: _showedItemsScrollController,
-        itemCount: showedItems.isEmpty ? 1 : showedItems.length,
-        itemExtent: widget.showedItemExtent,
-        itemBuilder: (context, index) {
-          if ((showedItems.isEmpty && allItems.isNotEmpty) ||
-              (showedItems.isEmpty && allItems.isEmpty)) {
-            return (widget.isCreatable ||
-                        (widget.overlayOptions?.canCreateItem ?? false)) &&
-                    _searchFieldTextEditingController.text.isNotEmpty
-                ? GestureDetector(
-                    onTap: _onCreateItem,
-                    child: AbsorbPointer(
-                      child: widget.createOptions?.createBuilder(
-                            _searchFieldTextEditingController.text,
-                          ) ??
-                          widget.overlayOptions?.createOptions!.createBuilder
-                              .call(
-                            _searchFieldTextEditingController.text,
-                          ),
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.all(6.0),
-                    child: widget.noResultsWidget ??
-                        const Text(
-                          'No results',
-                        ),
-                  );
-          }
-
-          final item = showedItems[index];
-          return widget.isOverlay
-              ? GestureDetector(
-                  onTap: () async {
-                    _onAddItem(item);
-                  },
-                  child: AbsorbPointer(
-                    child: widget.itemBuilder(
-                      item,
-                      index,
-                    ),
-                  ),
-                )
-              : GestureDetector(
-                  onTap: () {
-                    _onAddItem(item);
-                  },
-                  child: AbsorbPointer(
-                    child: widget.itemBuilder(
-                      item,
-                      index,
-                    ),
-                  ),
-                );
-        },
-      ),
-    );
-  }
-
   List<Widget> _pickedItemsBuilder(BuildContext context, bool display) {
     if (display == false) return [];
     return [
@@ -1262,12 +1270,14 @@ class _MultipleSearchSelectionState<T>
             thickness: widget.pickedItemsScrollbarThickness ?? 10,
             radius:
                 widget.pickedItemsScrollbarRadius ?? const Radius.circular(5),
-            controller: widget.pickedItemsScrollController,
+            controller:
+                widget.pickedItemsScrollController ?? ScrollController(),
             child: ScrollConfiguration(
               behavior:
                   ScrollConfiguration.of(context).copyWith(scrollbars: false),
               child: SingleChildScrollView(
-                controller: widget.pickedItemsScrollController,
+                controller:
+                    widget.pickedItemsScrollController ?? ScrollController(),
                 physics: widget.pickedItemsScrollPhysics,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -1363,7 +1373,6 @@ class _MultipleSearchSelectionState<T>
 
   @override
   void dispose() {
-    _showedItemsScrollController.dispose();
     _searchFieldTextEditingController.dispose();
     _searchFieldFocusNode.dispose();
     widget.controller?._setClearSearchFieldCallback(null);
@@ -1563,7 +1572,7 @@ class _MultipleSearchSelectionState<T>
                     ),
                   ),
               child: RawScrollbar(
-                controller: widget.showedItemsScrollController,
+                controller: _showedItemsScrollController,
                 thumbColor: widget.showedItemsScrollbarColor,
                 thickness: widget.showedItemsScrollbarMinThumbLength ?? 10,
                 minThumbLength: widget.showedItemsScrollbarMinThumbLength ?? 30,
@@ -1603,6 +1612,7 @@ class _MultipleSearchSelectionState<T>
 class MultipleSearchController<T> {
   MultipleSearchController({
     this.minCharsToShowItems,
+    this.allowDuplicateSelection = true,
   });
 
   Function()? clearSearchFieldCallback;
@@ -1619,6 +1629,9 @@ class MultipleSearchController<T> {
 
   /// The minimum number of characters to type before showing items.
   int? minCharsToShowItems;
+
+  /// Whether to allow an already picked item to be picked again.
+  bool allowDuplicateSelection;
 
   /// Clear all picked items.
   void clearAllPickedItems() {
