@@ -1,3 +1,8 @@
+## 2.6.5 ✨ New parameters
+
+- Adds `allowDuplicateSelection` parameter on `MultipleSearchController`. Defaults to `true`, whether you want duplicate items (if present on list) to be picked.
+- Adds `validator` parameter on `CreateOptions`. Defaults to `true`, a `bool Function(T)` to validate the item before creating it.
+
 ## 2.6.4 ✨ New parameter
 
 - Added the `minCharsToShowItems` parameter to `MultipleSearchController` to delay the search operation until the user has typed a minimum number of characters.
