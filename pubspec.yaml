@@ -2,6 +2,14 @@ name: multiple_search_selection
 description: A highly customizable multiple selection widget with fuzzy search functionality.
 version: 2.6.5
 homepage: "https://github.com/esentis/multiple_search_selection"
+topics:
+  - multiple-search
+  - search
+  - fuzzy-search
+  - ui
+  - widget
+  - flutter
+
 screenshots:
   - description: "Main screenshot"
     path: screenshots/main.gif
