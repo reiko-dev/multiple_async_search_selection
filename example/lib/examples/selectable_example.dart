@@ -2,52 +2,42 @@ import 'dart:developer';
 
 import 'package:example/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:multiple_search_selection/createable/create_options.dart';
 import 'package:multiple_search_selection/multiple_search_selection.dart';
 
-class CreatableConstructorExample extends StatelessWidget {
-  const CreatableConstructorExample({
+class SelectableExample extends StatelessWidget {
+  const SelectableExample({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    MultipleSearchController controller = MultipleSearchController();
+    MultipleSearchController<Country> controller = MultipleSearchController(
+      minCharsToShowItems: 3,
+      allowDuplicateSelection: false,
+      isSelectable: true,
+    );
     return Column(
       children: [
-        MultipleSearchSelection<Country>.creatable(
-          itemsVisibility: ShowedItemsVisibility.onType,
+        MultipleSearchSelection<Country>(
           searchField: TextField(
             decoration: InputDecoration(
               hintText: 'Search countries',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
               ),
-            ),
-          ),
-          createOptions: CreateOptions(
-            create: (text) {
-              return Country(name: text, iso: text);
-            },
-            validator: (country) {
-              return country.name.length > 2;
-            },
-            onDuplicate: (item) {
-              log('Duplicate item $item');
-            },
-            allowDuplicates: false,
-            onCreated: (c) => log('Country ${c.name} created'),
-            createBuilder: (text) => Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('Create "$text"'),
+              suffixIcon: IconButton(
+                onPressed: controller.clearSearchField,
+                icon: const Icon(
+                  Icons.clear,
+                ),
               ),
             ),
-            pickCreated: true,
           ),
+          onSearchChanged: (text) {
+            log('Text is $text');
+          },
           controller: controller,
-
+          itemsVisibility: ShowedItemsVisibility.onType,
           title: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Text(
@@ -62,7 +52,7 @@ class CreatableConstructorExample extends StatelessWidget {
             controller.getAllItems();
             controller.getPickedItems();
           },
-          clearSearchFieldOnSelect: true,
+          //  clearSearchFieldOnSelect: true,
           items: countries, // List<Country>
           fieldToCheck: (c) {
             return c.name;
@@ -73,14 +63,22 @@ class CreatableConstructorExample extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(6),
-                  color: Colors.white,
+                  color: isPicked ? Colors.blue[100] : Colors.white,
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     vertical: 20.0,
                     horizontal: 12,
                   ),
-                  child: Text(country.name),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                          value: isPicked,
+                          // This has no effect on the UI is the logic is handled internally
+                          onChanged: (value) {}),
+                      Text(country.name),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -93,7 +91,11 @@ class CreatableConstructorExample extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: Text(country.name),
+                child: Row(
+                  children: [
+                    Text(country.name),
+                  ],
+                ),
               ),
             );
           },
@@ -133,38 +135,6 @@ class CreatableConstructorExample extends StatelessWidget {
           fuzzySearch: FuzzySearch.none,
           showSelectAllButton: true,
           maximumShowItemsHeight: 200,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 150,
-                  height: 50,
-                  color: Colors.red,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 150,
-                  height: 50,
-                  color: Colors.yellow,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 150,
-                  height: 50,
-                  color: Colors.blue,
-                ),
-              ),
-            ],
-          ),
         ),
       ],
     );

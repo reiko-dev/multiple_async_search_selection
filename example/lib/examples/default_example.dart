@@ -56,7 +56,7 @@ class DefaultConstructorExample extends StatelessWidget {
           fieldToCheck: (c) {
             return c.name;
           },
-          itemBuilder: (country, index) {
+          itemBuilder: (country, index, isPicked) {
             return Padding(
               padding: const EdgeInsets.all(6.0),
               child: Container(

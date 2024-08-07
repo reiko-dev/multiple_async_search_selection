@@ -28,7 +28,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
     required List<T> items,
     required Widget Function(T) pickedItemBuilder,
     required String Function(T) fieldToCheck,
-    required Widget Function(T, int) itemBuilder,
+    required Widget Function(T, int, bool) itemBuilder,
     void Function(T)? onItemRemoved,
     void Function(T)? onItemAdded,
     void Function(List<T>)? onPickedChange,
@@ -155,7 +155,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
     required List<T> items,
     required Widget Function(T) pickedItemBuilder,
     required String Function(T) fieldToCheck,
-    required Widget Function(T, int) itemBuilder,
+    required Widget Function(T, int, bool) itemBuilder,
     required CreateOptions<T> createOptions,
     Widget Function(List<Widget> pickedItems)? pickedItemsContainerBuilder,
     void Function(T)? onItemRemoved,
@@ -282,7 +282,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
     required List<T> items,
     required Widget Function(T) pickedItemBuilder,
     required String Function(T) fieldToCheck,
-    required Widget Function(T, int) itemBuilder,
+    required Widget Function(T, int, bool) itemBuilder,
     void Function(T)? onItemRemoved,
     void Function(T)? onItemAdded,
     void Function(List<T>)? onPickedChange,
@@ -655,7 +655,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
   /// This is the builder of showed items.
   ///
   /// [index] is the index of the item in the showed items list.
-  final Widget Function(T, int) itemBuilder;
+  final Widget Function(T, int, bool) itemBuilder;
 
   /// The toggle items button when [itemsVisibility] == [ShowedItemsVisibility.toggle]. Ontap logic is already defined and you can't override it with
   ///
@@ -882,6 +882,8 @@ class _MultipleSearchSelectionState<T>
           }
 
           final item = showedItems[index];
+          final bool isPicked = pickedItems.contains(item);
+
           return widget.isOverlay
               ? GestureDetector(
                   onTap: () async {
@@ -891,6 +893,7 @@ class _MultipleSearchSelectionState<T>
                     child: widget.itemBuilder(
                       item,
                       index,
+                      isPicked,
                     ),
                   ),
                 )
@@ -902,6 +905,7 @@ class _MultipleSearchSelectionState<T>
                     child: widget.itemBuilder(
                       item,
                       index,
+                      isPicked,
                     ),
                   ),
                 );
@@ -1008,8 +1012,14 @@ class _MultipleSearchSelectionState<T>
   }
 
   void _onRemoveItem(T item) {
+    final bool isSelectable = widget.controller?.isSelectable ?? false;
+
     pickedItems.remove(item);
-    allItems.add(item);
+
+    if (!isSelectable) {
+      allItems.add(item);
+    }
+
     if (widget.sortShowedItems ?? false) {
       allItems.sort(
         (a, b) => widget.fieldToCheck(a).compareTo(
@@ -1028,14 +1038,25 @@ class _MultipleSearchSelectionState<T>
   }
 
   void _onAddItem(T item) {
+    final bool isSelectable = widget.controller?.isSelectable ?? false;
+
+    // If user has selected the maximum number of items, return
     if (widget.maxSelectedItems != null &&
         pickedItems.length >= widget.maxSelectedItems!) {
       Navigator.pop(context);
       return;
     }
 
+    // If the item is already picked, and the user does not allow dublicates return
     if (pickedItems.contains(item) &&
-        !(widget.controller?.allowDuplicateSelection ?? true)) {
+        !(widget.controller?.allowDuplicateSelection ?? true) &&
+        !isSelectable) {
+      return;
+    }
+
+    // If the style is selectable and the item is already picked, remove it
+    if (pickedItems.contains(item) && isSelectable) {
+      _onRemoveItem(item);
       return;
     }
 
@@ -1049,8 +1070,11 @@ class _MultipleSearchSelectionState<T>
             ),
       );
     }
-    allItems.remove(pickedItem);
-    showedItems.remove(pickedItem);
+    if (!isSelectable) {
+      allItems.remove(pickedItem);
+      showedItems.remove(pickedItem);
+    }
+
     widget.onPickedChange?.call(
       pickedItems,
     );
@@ -1613,6 +1637,7 @@ class MultipleSearchController<T> {
   MultipleSearchController({
     this.minCharsToShowItems,
     this.allowDuplicateSelection = true,
+    this.isSelectable = false,
   });
 
   Function()? clearSearchFieldCallback;
@@ -1632,6 +1657,11 @@ class MultipleSearchController<T> {
 
   /// Whether to allow an already picked item to be picked again.
   bool allowDuplicateSelection;
+
+  /// Whether the widget has 'selectable' style.
+  /// In this style when you select an item it will NOT be removed
+  /// from the showed items list.
+  final bool isSelectable;
 
   /// Clear all picked items.
   void clearAllPickedItems() {
