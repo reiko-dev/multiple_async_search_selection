@@ -9,13 +9,16 @@
 #### A highly customizable multiple selection widget with fuzzy search functionality
 
 ```dart
-// Use this controller to
+// Use this controller to adjust the behaviour of the widget
 // 1. getAllItems
 // 2. getPickedItems
 // 3. searchItems
 // 4. clearSearchField
 // 5. clearAllPickedItems
 // 6. selectAllItems
+// 7. minCharsToShowItems
+// 8. allowDuplicateSelection
+// 9. isSelectable
 MultipleSearchController controller = MultipleSearchController();
 MultipleSearchSelection<Country>(
   // The TextField that is used to search items.
@@ -38,7 +41,7 @@ MultipleSearchSelection<Country>(
   fieldToCheck: (c) {
     return c.name; // String
   },
-  itemBuilder: (country) {
+  itemBuilder: (country,index,isPicked) {
     return Padding(
       padding: const EdgeInsets.all(6.0),
       child: Container(
@@ -56,7 +59,7 @@ MultipleSearchSelection<Country>(
       ),
     );
   },
-  pickedItemBuilder: (country) {
+  pickedItemBuilder: (country,index,isPicked) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,

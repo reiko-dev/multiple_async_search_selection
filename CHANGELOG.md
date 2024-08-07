@@ -1,3 +1,66 @@
+## 2.7.0 ✨🔥 Breaking Changes & New Features
+
+- All examples are updated to reflect the breaking changes
+  - A new example added for the selectable style
+- Adds library's topics
+
+### Features
+
+- Adds `isSelectable` parameter on `MultipleSearchController` (defaults to `false` if not provided).
+  This will slightly adjust the behaviour of the showed items. The items are not removed from the list when selected.
+
+<img src="https://i.imgur.com/mFIS7uc.gif " height="450px" title="pickedItemsBuilder" />
+
+### Breaking changes
+
+- A third parameter, `isPicked` is added on `itemBuilder`. This way you can change the looks of the item when it is already picked (e.g checkbox) :
+
+_versions <2.7.0_
+
+```dart
+itemBuilder: (country, index) {
+  return Padding(
+    padding: const EdgeInsets.all(6.0),
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+        color: Colors.white,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 20.0,
+          horizontal: 12,
+        ),
+        child: Text(country.name),
+      ),
+    ),
+  );
+},
+```
+
+_versions >=2.7.0_
+
+```dart
+itemBuilder: (country, index, isPicked) {
+  return Padding(
+    padding: const EdgeInsets.all(6.0),
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+        color: Colors.white,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 20.0,
+          horizontal: 12,
+        ),
+        child: Text(country.name),
+      ),
+    ),
+  );
+},
+```
+
 ## 2.6.5 ✨ New parameters
 
 - Adds `allowDuplicateSelection` parameter on `MultipleSearchController`. Defaults to `true`, whether you want duplicate items (if present on list) to be picked.
