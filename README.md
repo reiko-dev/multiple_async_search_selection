@@ -59,7 +59,7 @@ MultipleSearchSelection<Country>(
       ),
     );
   },
-  pickedItemBuilder: (country,index,isPicked) {
+  pickedItemBuilder: (country) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
