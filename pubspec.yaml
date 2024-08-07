@@ -21,6 +21,8 @@ screenshots:
     path: screenshots/on_toggle.gif
   - description: "On type screenshot"
     path: screenshots/on_type.gif
+  - description: "Selectable style"
+    path: screenshots/selectable.gif
 
 environment:
   sdk: ">=2.17.0 <4.0.0"
