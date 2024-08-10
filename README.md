@@ -2,9 +2,12 @@
 <img src='https://i.imgur.com/3dHOaoF.gif' width=500>
 </p>
 <p align="center">
- <img src="https://img.shields.io/pub/v/multiple_search_selection?color=637d0d&style=for-the-badge" alt="Version" /> <img src="https://img.shields.io/github/languages/code-size/esentis/multiple_search_selection?color=637d0d&style=for-the-badge&label=size" alt="Version" />
+ <img src="https://img.shields.io/pub/v/multiple_search_selection?color=637d0d&style=for-the-badge&logo=flutter" alt="Version" /> <img src="https://img.shields.io/github/languages/code-size/esentis/multiple_search_selection?color=637d0d&style=for-the-badge&label=size" alt="Version" />
 </br>
 </p>
+<p align="center">
+Show some love by dropping a ⭐ at GitHub </br>
+<a href="https://github.com/esentis/multiple_search_selection/stargazers"><img src="https://img.shields.io/github/stars/esentis/multiple_search_selection?style=for-the-badge&logo=github&color=637d0d" alt="HTML tutorial"></a>
 
 #### A highly customizable multiple selection widget with fuzzy search functionality
 
