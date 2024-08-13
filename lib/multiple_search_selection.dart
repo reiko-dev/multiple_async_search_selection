@@ -81,71 +81,77 @@ class MultipleSearchSelection<T> extends StatefulWidget {
     bool? placePickedItemContainerBelow,
     MultipleSearchController? controller,
     Function(String)? onSearchChanged,
-  }) =>
-      MultipleSearchSelection._(
-        items: items,
-        title: title,
-        maxSelectedItems: maxSelectedItems,
-        isCreatable: false,
-        isOverlay: false,
-        key: key ?? ValueKey(items.hashCode),
-        clearSearchFieldOnSelect: clearSearchFieldOnSelect ?? false,
-        fieldToCheck: fieldToCheck,
-        itemBuilder: itemBuilder,
-        onPickedChange: onPickedChange,
-        pickedItemBuilder: pickedItemBuilder,
-        clearAllButton: clearAllButton,
-        fuzzySearch: fuzzySearch ?? FuzzySearch.none,
-        initialPickedItems: initialPickedItems,
-        itemsVisibility: itemsVisibility ?? ShowedItemsVisibility.alwaysOn,
-        maximumShowItemsHeight: maximumShowItemsHeight ?? 150,
-        noResultsWidget: noResultsWidget,
-        onItemAdded: onItemAdded,
-        onItemRemoved: onItemRemoved,
-        onTapClearAll: onTapClearAll,
-        onTapSelectAll: onTapSelectAll,
-        onTapShowItems: onTapShowItems,
-        onTapShowedItem: onTapShowedItem,
-        pickedItemSpacing: pickedItemSpacing,
-        pickedItemsBoxDecoration: pickedItemsBoxDecoration,
-        pickedItemsContainerMaxHeight: pickedItemsContainerMaxHeight,
-        pickedItemsContainerMinHeight: pickedItemsContainerMinHeight,
-        pickedItemsScrollController:
-            pickedItemsScrollController ?? ScrollController(),
-        pickedItemsScrollPhysics: pickedItemsScrollPhysics,
-        pickedItemsScrollbarColor: pickedItemsScrollbarColor,
-        pickedItemsScrollbarMinOverscrollLength:
-            pickedItemsScrollbarMinOverscrollLength,
-        pickedItemsScrollbarMinThumbLength: pickedItemsScrollbarMinThumbLength,
-        pickedItemsScrollbarRadius: pickedItemsScrollbarRadius,
-        pickedItemsScrollbarThickness: pickedItemsScrollbarThickness,
-        selectAllButton: selectAllButton,
-        showClearAllButton: showClearAllButton,
-        showItemsButton: showItemsButton,
-        showPickedItemScrollbar: showPickedItemScrollbar,
-        showSelectAllButton: showSelectAllButton,
-        showShowedItemsScrollbar: showShowedItemsScrollbar,
-        showedItemContainerHeight: showedItemContainerHeight,
-        showedItemContainerPadding: showedItemContainerPadding,
-        showedItemsBoxDecoration: showedItemsBoxDecoration,
-        showedItemsScrollController: showedItemsScrollController,
-        showedItemsScrollPhysics: showedItemsScrollPhysics,
-        showedItemsScrollbarColor: showedItemsScrollbarColor,
-        showedItemsScrollbarMinOverscrollLength:
-            showedItemsScrollbarMinOverscrollLength,
-        showedItemsScrollbarMinThumbLength: showedItemsScrollbarMinThumbLength,
-        showedItemsScrollbarRadius: showedItemsScrollbarRadius,
-        sortPickedItems: sortPickedItems ?? false,
-        sortShowedItems: sortShowedItems ?? false,
-        caseSensitiveSearch: caseSensitiveSearch ?? false,
-        pickedItemsContainerBuilder: pickedItemsContainerBuilder,
-        hintText: hintText,
-        showedItemExtent: showedItemExtent,
-        placePickedItemContainerBelow: placePickedItemContainerBelow ?? false,
-        controller: controller ?? MultipleSearchController(),
-        searchField: searchField,
-        onSearchChanged: onSearchChanged,
-      );
+  }) {
+    assert(
+      !(itemsVisibility == ShowedItemsVisibility.alwaysOn &&
+          (controller?.minCharsToShowItems != null)),
+      'itemsVisibility cannot be ShowedItemsVisibility.alwaysOn when minCharsToShowItems is not null on MultipleSearchController',
+    );
+    return MultipleSearchSelection._(
+      items: items,
+      title: title,
+      maxSelectedItems: maxSelectedItems,
+      isCreatable: false,
+      isOverlay: false,
+      key: key ?? ValueKey(items.hashCode),
+      clearSearchFieldOnSelect: clearSearchFieldOnSelect ?? false,
+      fieldToCheck: fieldToCheck,
+      itemBuilder: itemBuilder,
+      onPickedChange: onPickedChange,
+      pickedItemBuilder: pickedItemBuilder,
+      clearAllButton: clearAllButton,
+      fuzzySearch: fuzzySearch ?? FuzzySearch.none,
+      initialPickedItems: initialPickedItems,
+      itemsVisibility: itemsVisibility ?? ShowedItemsVisibility.alwaysOn,
+      maximumShowItemsHeight: maximumShowItemsHeight ?? 150,
+      noResultsWidget: noResultsWidget,
+      onItemAdded: onItemAdded,
+      onItemRemoved: onItemRemoved,
+      onTapClearAll: onTapClearAll,
+      onTapSelectAll: onTapSelectAll,
+      onTapShowItems: onTapShowItems,
+      onTapShowedItem: onTapShowedItem,
+      pickedItemSpacing: pickedItemSpacing,
+      pickedItemsBoxDecoration: pickedItemsBoxDecoration,
+      pickedItemsContainerMaxHeight: pickedItemsContainerMaxHeight,
+      pickedItemsContainerMinHeight: pickedItemsContainerMinHeight,
+      pickedItemsScrollController:
+          pickedItemsScrollController ?? ScrollController(),
+      pickedItemsScrollPhysics: pickedItemsScrollPhysics,
+      pickedItemsScrollbarColor: pickedItemsScrollbarColor,
+      pickedItemsScrollbarMinOverscrollLength:
+          pickedItemsScrollbarMinOverscrollLength,
+      pickedItemsScrollbarMinThumbLength: pickedItemsScrollbarMinThumbLength,
+      pickedItemsScrollbarRadius: pickedItemsScrollbarRadius,
+      pickedItemsScrollbarThickness: pickedItemsScrollbarThickness,
+      selectAllButton: selectAllButton,
+      showClearAllButton: showClearAllButton,
+      showItemsButton: showItemsButton,
+      showPickedItemScrollbar: showPickedItemScrollbar,
+      showSelectAllButton: showSelectAllButton,
+      showShowedItemsScrollbar: showShowedItemsScrollbar,
+      showedItemContainerHeight: showedItemContainerHeight,
+      showedItemContainerPadding: showedItemContainerPadding,
+      showedItemsBoxDecoration: showedItemsBoxDecoration,
+      showedItemsScrollController: showedItemsScrollController,
+      showedItemsScrollPhysics: showedItemsScrollPhysics,
+      showedItemsScrollbarColor: showedItemsScrollbarColor,
+      showedItemsScrollbarMinOverscrollLength:
+          showedItemsScrollbarMinOverscrollLength,
+      showedItemsScrollbarMinThumbLength: showedItemsScrollbarMinThumbLength,
+      showedItemsScrollbarRadius: showedItemsScrollbarRadius,
+      sortPickedItems: sortPickedItems ?? false,
+      sortShowedItems: sortShowedItems ?? false,
+      caseSensitiveSearch: caseSensitiveSearch ?? false,
+      pickedItemsContainerBuilder: pickedItemsContainerBuilder,
+      hintText: hintText,
+      showedItemExtent: showedItemExtent,
+      placePickedItemContainerBelow: placePickedItemContainerBelow ?? false,
+      controller: controller ?? MultipleSearchController(),
+      searchField: searchField,
+      onSearchChanged: onSearchChanged,
+    );
+  }
 
   /// [MultipleSearchSelection.creatable] constructor provides a way to add a new item in your list,
   ///
@@ -208,71 +214,77 @@ class MultipleSearchSelection<T> extends StatefulWidget {
     bool? placePickedItemContainerBelow,
     MultipleSearchController? controller,
     Function(String)? onSearchChanged,
-  }) =>
-      MultipleSearchSelection._(
-        searchField: searchField,
-        items: items,
-        title: title,
-        maxSelectedItems: maxSelectedItems,
-        isCreatable: true,
-        createOptions: createOptions,
-        isOverlay: false,
-        key: key ?? ValueKey(items.hashCode),
-        clearSearchFieldOnSelect: clearSearchFieldOnSelect ?? false,
-        fieldToCheck: fieldToCheck,
-        itemBuilder: itemBuilder,
-        onPickedChange: onPickedChange,
-        pickedItemBuilder: pickedItemBuilder,
-        clearAllButton: clearAllButton,
-        fuzzySearch: fuzzySearch ?? FuzzySearch.none,
-        initialPickedItems: initialPickedItems,
-        itemsVisibility: itemsVisibility ?? ShowedItemsVisibility.alwaysOn,
-        maximumShowItemsHeight: maximumShowItemsHeight ?? 150,
-        onItemAdded: onItemAdded,
-        onItemRemoved: onItemRemoved,
-        onTapClearAll: onTapClearAll,
-        onTapSelectAll: onTapSelectAll,
-        onTapShowItems: onTapShowItems,
-        onTapShowedItem: onTapShowedItem,
-        pickedItemSpacing: pickedItemSpacing,
-        pickedItemsBoxDecoration: pickedItemsBoxDecoration,
-        pickedItemsContainerMaxHeight: pickedItemsContainerMaxHeight,
-        pickedItemsContainerMinHeight: pickedItemsContainerMinHeight,
-        pickedItemsScrollController:
-            pickedItemsScrollController ?? ScrollController(),
-        pickedItemsScrollPhysics: pickedItemsScrollPhysics,
-        pickedItemsScrollbarColor: pickedItemsScrollbarColor,
-        pickedItemsScrollbarMinOverscrollLength:
-            pickedItemsScrollbarMinOverscrollLength,
-        pickedItemsScrollbarMinThumbLength: pickedItemsScrollbarMinThumbLength,
-        pickedItemsScrollbarRadius: pickedItemsScrollbarRadius,
-        pickedItemsScrollbarThickness: pickedItemsScrollbarThickness,
-        selectAllButton: selectAllButton,
-        showClearAllButton: showClearAllButton,
-        showItemsButton: showItemsButton,
-        showPickedItemScrollbar: showPickedItemScrollbar,
-        showSelectAllButton: showSelectAllButton,
-        showShowedItemsScrollbar: showShowedItemsScrollbar,
-        showedItemContainerHeight: showedItemContainerHeight,
-        showedItemContainerPadding: showedItemContainerPadding,
-        showedItemsBoxDecoration: showedItemsBoxDecoration,
-        showedItemsScrollController: showedItemsScrollController,
-        showedItemsScrollPhysics: showedItemsScrollPhysics,
-        showedItemsScrollbarColor: showedItemsScrollbarColor,
-        showedItemsScrollbarMinOverscrollLength:
-            showedItemsScrollbarMinOverscrollLength,
-        showedItemsScrollbarMinThumbLength: showedItemsScrollbarMinThumbLength,
-        showedItemsScrollbarRadius: showedItemsScrollbarRadius,
-        sortPickedItems: sortPickedItems ?? false,
-        sortShowedItems: sortShowedItems ?? false,
-        caseSensitiveSearch: caseSensitiveSearch ?? false,
-        pickedItemsContainerBuilder: pickedItemsContainerBuilder,
-        hintText: hintText,
-        showedItemExtent: showedItemExtent,
-        placePickedItemContainerBelow: placePickedItemContainerBelow ?? false,
-        controller: controller ?? MultipleSearchController(),
-        onSearchChanged: onSearchChanged,
-      );
+  }) {
+    assert(
+      !(itemsVisibility == ShowedItemsVisibility.alwaysOn &&
+          (controller?.minCharsToShowItems != null)),
+      'itemsVisibility cannot be ShowedItemsVisibility.alwaysOn when minCharsToShowItems is not null on MultipleSearchController',
+    );
+    return MultipleSearchSelection._(
+      searchField: searchField,
+      items: items,
+      title: title,
+      maxSelectedItems: maxSelectedItems,
+      isCreatable: true,
+      createOptions: createOptions,
+      isOverlay: false,
+      key: key ?? ValueKey(items.hashCode),
+      clearSearchFieldOnSelect: clearSearchFieldOnSelect ?? false,
+      fieldToCheck: fieldToCheck,
+      itemBuilder: itemBuilder,
+      onPickedChange: onPickedChange,
+      pickedItemBuilder: pickedItemBuilder,
+      clearAllButton: clearAllButton,
+      fuzzySearch: fuzzySearch ?? FuzzySearch.none,
+      initialPickedItems: initialPickedItems,
+      itemsVisibility: itemsVisibility ?? ShowedItemsVisibility.alwaysOn,
+      maximumShowItemsHeight: maximumShowItemsHeight ?? 150,
+      onItemAdded: onItemAdded,
+      onItemRemoved: onItemRemoved,
+      onTapClearAll: onTapClearAll,
+      onTapSelectAll: onTapSelectAll,
+      onTapShowItems: onTapShowItems,
+      onTapShowedItem: onTapShowedItem,
+      pickedItemSpacing: pickedItemSpacing,
+      pickedItemsBoxDecoration: pickedItemsBoxDecoration,
+      pickedItemsContainerMaxHeight: pickedItemsContainerMaxHeight,
+      pickedItemsContainerMinHeight: pickedItemsContainerMinHeight,
+      pickedItemsScrollController:
+          pickedItemsScrollController ?? ScrollController(),
+      pickedItemsScrollPhysics: pickedItemsScrollPhysics,
+      pickedItemsScrollbarColor: pickedItemsScrollbarColor,
+      pickedItemsScrollbarMinOverscrollLength:
+          pickedItemsScrollbarMinOverscrollLength,
+      pickedItemsScrollbarMinThumbLength: pickedItemsScrollbarMinThumbLength,
+      pickedItemsScrollbarRadius: pickedItemsScrollbarRadius,
+      pickedItemsScrollbarThickness: pickedItemsScrollbarThickness,
+      selectAllButton: selectAllButton,
+      showClearAllButton: showClearAllButton,
+      showItemsButton: showItemsButton,
+      showPickedItemScrollbar: showPickedItemScrollbar,
+      showSelectAllButton: showSelectAllButton,
+      showShowedItemsScrollbar: showShowedItemsScrollbar,
+      showedItemContainerHeight: showedItemContainerHeight,
+      showedItemContainerPadding: showedItemContainerPadding,
+      showedItemsBoxDecoration: showedItemsBoxDecoration,
+      showedItemsScrollController: showedItemsScrollController,
+      showedItemsScrollPhysics: showedItemsScrollPhysics,
+      showedItemsScrollbarColor: showedItemsScrollbarColor,
+      showedItemsScrollbarMinOverscrollLength:
+          showedItemsScrollbarMinOverscrollLength,
+      showedItemsScrollbarMinThumbLength: showedItemsScrollbarMinThumbLength,
+      showedItemsScrollbarRadius: showedItemsScrollbarRadius,
+      sortPickedItems: sortPickedItems ?? false,
+      sortShowedItems: sortShowedItems ?? false,
+      caseSensitiveSearch: caseSensitiveSearch ?? false,
+      pickedItemsContainerBuilder: pickedItemsContainerBuilder,
+      hintText: hintText,
+      showedItemExtent: showedItemExtent,
+      placePickedItemContainerBelow: placePickedItemContainerBelow ?? false,
+      controller: controller ?? MultipleSearchController(),
+      onSearchChanged: onSearchChanged,
+    );
+  }
 
   /// [MultipleSearchSelection.overlay] is a widget that can be used to show the search results in an overlay.
   ///
@@ -334,72 +346,85 @@ class MultipleSearchSelection<T> extends StatefulWidget {
     int? maxSelectedItems,
     bool? placePickedItemContainerBelow,
     MultipleSearchController? controller,
+    ShowedItemsVisibility? itemsVisibility,
     Function(String)? onSearchChanged,
-  }) =>
-      MultipleSearchSelection._(
-        searchField: searchField,
-        items: items,
-        title: title,
-        maxSelectedItems: maxSelectedItems,
-        isCreatable: false,
-        isOverlay: true,
-        overlayOptions: overlayOptions,
-        key: key ?? ValueKey(items.hashCode),
-        clearSearchFieldOnSelect: clearSearchFieldOnSelect ?? false,
-        fieldToCheck: fieldToCheck,
-        itemBuilder: itemBuilder,
-        onPickedChange: onPickedChange,
-        pickedItemBuilder: pickedItemBuilder,
-        clearAllButton: clearAllButton,
-        fuzzySearch: fuzzySearch ?? FuzzySearch.none,
-        initialPickedItems: initialPickedItems,
-        maximumShowItemsHeight: maximumShowItemsHeight ?? 150,
-        noResultsWidget: noResultsWidget,
-        onItemAdded: onItemAdded,
-        onItemRemoved: onItemRemoved,
-        onTapClearAll: onTapClearAll,
-        onTapSelectAll: onTapSelectAll,
-        onTapShowItems: onTapShowItems,
-        onTapShowedItem: onTapShowedItem,
-        pickedItemSpacing: pickedItemSpacing,
-        pickedItemsBoxDecoration: pickedItemsBoxDecoration,
-        pickedItemsContainerMaxHeight: pickedItemsContainerMaxHeight,
-        pickedItemsContainerMinHeight: pickedItemsContainerMinHeight,
-        pickedItemsScrollController:
-            pickedItemsScrollController ?? ScrollController(),
-        pickedItemsScrollPhysics: pickedItemsScrollPhysics,
-        pickedItemsScrollbarColor: pickedItemsScrollbarColor,
-        pickedItemsScrollbarMinOverscrollLength:
-            pickedItemsScrollbarMinOverscrollLength,
-        pickedItemsScrollbarMinThumbLength: pickedItemsScrollbarMinThumbLength,
-        pickedItemsScrollbarRadius: pickedItemsScrollbarRadius,
-        pickedItemsScrollbarThickness: pickedItemsScrollbarThickness,
-        selectAllButton: selectAllButton,
-        showClearAllButton: showClearAllButton,
-        showItemsButton: showItemsButton,
-        showPickedItemScrollbar: showPickedItemScrollbar,
-        showSelectAllButton: showSelectAllButton,
-        showShowedItemsScrollbar: showShowedItemsScrollbar,
-        showedItemContainerHeight: showedItemContainerHeight,
-        showedItemContainerPadding: showedItemContainerPadding,
-        showedItemsBoxDecoration: showedItemsBoxDecoration,
-        showedItemsScrollController: showedItemsScrollController,
-        showedItemsScrollPhysics: showedItemsScrollPhysics,
-        showedItemsScrollbarColor: showedItemsScrollbarColor,
-        showedItemsScrollbarMinOverscrollLength:
-            showedItemsScrollbarMinOverscrollLength,
-        showedItemsScrollbarMinThumbLength: showedItemsScrollbarMinThumbLength,
-        showedItemsScrollbarRadius: showedItemsScrollbarRadius,
-        sortPickedItems: sortPickedItems ?? false,
-        sortShowedItems: sortShowedItems ?? false,
-        caseSensitiveSearch: caseSensitiveSearch ?? false,
-        pickedItemsContainerBuilder: pickedItemsContainerBuilder,
-        hintText: hintText,
-        showedItemExtent: showedItemExtent,
-        placePickedItemContainerBelow: placePickedItemContainerBelow ?? false,
-        controller: controller ?? MultipleSearchController(),
-        onSearchChanged: onSearchChanged,
-      );
+  }) {
+    // Assertion to ensure the condition is met
+    assert(
+      !(itemsVisibility == ShowedItemsVisibility.alwaysOn &&
+          (controller?.minCharsToShowItems != null)),
+      'itemsVisibility cannot be ShowedItemsVisibility.alwaysOn when minCharsToShowItems is not null on MultipleSearchController',
+    );
+    assert(
+      !(itemsVisibility == ShowedItemsVisibility.toggle),
+      'Toggle items visibility is not supported in overlay mode',
+    );
+    return MultipleSearchSelection._(
+      searchField: searchField,
+      items: items,
+      title: title,
+      maxSelectedItems: maxSelectedItems,
+      isCreatable: false,
+      isOverlay: true,
+      overlayOptions: overlayOptions,
+      key: key ?? ValueKey(items.hashCode),
+      clearSearchFieldOnSelect: clearSearchFieldOnSelect ?? false,
+      fieldToCheck: fieldToCheck,
+      itemBuilder: itemBuilder,
+      itemsVisibility: itemsVisibility ?? ShowedItemsVisibility.onType,
+      onPickedChange: onPickedChange,
+      pickedItemBuilder: pickedItemBuilder,
+      clearAllButton: clearAllButton,
+      fuzzySearch: fuzzySearch ?? FuzzySearch.none,
+      initialPickedItems: initialPickedItems,
+      maximumShowItemsHeight: maximumShowItemsHeight ?? 150,
+      noResultsWidget: noResultsWidget,
+      onItemAdded: onItemAdded,
+      onItemRemoved: onItemRemoved,
+      onTapClearAll: onTapClearAll,
+      onTapSelectAll: onTapSelectAll,
+      onTapShowItems: onTapShowItems,
+      onTapShowedItem: onTapShowedItem,
+      pickedItemSpacing: pickedItemSpacing,
+      pickedItemsBoxDecoration: pickedItemsBoxDecoration,
+      pickedItemsContainerMaxHeight: pickedItemsContainerMaxHeight,
+      pickedItemsContainerMinHeight: pickedItemsContainerMinHeight,
+      pickedItemsScrollController:
+          pickedItemsScrollController ?? ScrollController(),
+      pickedItemsScrollPhysics: pickedItemsScrollPhysics,
+      pickedItemsScrollbarColor: pickedItemsScrollbarColor,
+      pickedItemsScrollbarMinOverscrollLength:
+          pickedItemsScrollbarMinOverscrollLength,
+      pickedItemsScrollbarMinThumbLength: pickedItemsScrollbarMinThumbLength,
+      pickedItemsScrollbarRadius: pickedItemsScrollbarRadius,
+      pickedItemsScrollbarThickness: pickedItemsScrollbarThickness,
+      selectAllButton: selectAllButton,
+      showClearAllButton: showClearAllButton,
+      showItemsButton: showItemsButton,
+      showPickedItemScrollbar: showPickedItemScrollbar,
+      showSelectAllButton: showSelectAllButton,
+      showShowedItemsScrollbar: showShowedItemsScrollbar,
+      showedItemContainerHeight: showedItemContainerHeight,
+      showedItemContainerPadding: showedItemContainerPadding,
+      showedItemsBoxDecoration: showedItemsBoxDecoration,
+      showedItemsScrollController: showedItemsScrollController,
+      showedItemsScrollPhysics: showedItemsScrollPhysics,
+      showedItemsScrollbarColor: showedItemsScrollbarColor,
+      showedItemsScrollbarMinOverscrollLength:
+          showedItemsScrollbarMinOverscrollLength,
+      showedItemsScrollbarMinThumbLength: showedItemsScrollbarMinThumbLength,
+      showedItemsScrollbarRadius: showedItemsScrollbarRadius,
+      sortPickedItems: sortPickedItems ?? false,
+      sortShowedItems: sortShowedItems ?? false,
+      caseSensitiveSearch: caseSensitiveSearch ?? false,
+      pickedItemsContainerBuilder: pickedItemsContainerBuilder,
+      hintText: hintText,
+      showedItemExtent: showedItemExtent,
+      placePickedItemContainerBelow: placePickedItemContainerBelow ?? false,
+      controller: controller ?? MultipleSearchController(),
+      onSearchChanged: onSearchChanged,
+    );
+  }
 
   /// Private constructor
   const MultipleSearchSelection._({
@@ -839,6 +864,12 @@ class _MultipleSearchSelectionState<T>
   }
 
   Widget _buildShowedItems() {
+    if (widget.maxSelectedItems != null &&
+            widget.maxSelectedItems! <= pickedItems.length ||
+        (widget.itemsVisibility != ShowedItemsVisibility.alwaysOn &&
+            !showAllItems)) {
+      return const SizedBox();
+    }
     return TapRegion(
       onTapOutside: (event) {
         if (widget.isOverlay) {
@@ -935,23 +966,24 @@ class _MultipleSearchSelectionState<T>
               constraints: BoxConstraints(
                 maxHeight: widget.maximumShowItemsHeight,
               ),
-              decoration: widget.showedItemsBoxDecoration ??
-                  BoxDecoration(
-                    color: Colors.grey.withOpacity(0.1),
-                    border: Border(
-                      bottom: BorderSide(color: Colors.grey.withOpacity(0.5)),
-                      left: BorderSide(color: Colors.grey.withOpacity(0.5)),
-                      right: BorderSide(color: Colors.grey.withOpacity(0.5)),
-                    ),
-                  ),
+              decoration: showAllItems
+                  ? widget.showedItemsBoxDecoration ??
+                      BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        border: Border(
+                          bottom:
+                              BorderSide(color: Colors.grey.withOpacity(0.5)),
+                          left: BorderSide(color: Colors.grey.withOpacity(0.5)),
+                          right:
+                              BorderSide(color: Colors.grey.withOpacity(0.5)),
+                        ),
+                      )
+                  : null,
               child: ScrollConfiguration(
                 behavior: ScrollConfiguration.of(context).copyWith(
                   scrollbars: false,
                 ),
-                child: widget.maxSelectedItems != null &&
-                        widget.maxSelectedItems! <= pickedItems.length
-                    ? const SizedBox()
-                    : _buildShowedItems(),
+                child: _buildShowedItems(),
               ),
             ),
           ),
@@ -1340,6 +1372,7 @@ class _MultipleSearchSelectionState<T>
   void _onSearchFieldChanged(String value) {
     if (widget.controller?.minCharsToShowItems is int &&
         value.length < widget.controller!.minCharsToShowItems!) {
+      print('We should not show all items');
       showAllItems = false;
       setState(() {});
       return;
@@ -1483,9 +1516,7 @@ class _MultipleSearchSelectionState<T>
                                                 .copyWith(
                                           scrollbars: false,
                                         ),
-                                        child: maxItemsSelected
-                                            ? const SizedBox()
-                                            : _buildShowedItems(),
+                                        child: _buildShowedItems(),
                                       ),
                                     ),
                                   ],
@@ -1608,8 +1639,7 @@ class _MultipleSearchSelectionState<T>
                 child: ScrollConfiguration(
                   behavior: ScrollConfiguration.of(context)
                       .copyWith(scrollbars: false),
-                  child:
-                      maxItemsSelected ? const SizedBox() : _buildShowedItems(),
+                  child: _buildShowedItems(),
                 ),
               ),
             ),
