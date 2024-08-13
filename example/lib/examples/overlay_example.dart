@@ -13,10 +13,12 @@ class OverlayConstructorExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MultipleSearchController controller = MultipleSearchController();
+    MultipleSearchController controller =
+        MultipleSearchController(minCharsToShowItems: 3);
     return Column(
       children: [
         MultipleSearchSelection<Country>.overlay(
+          itemsVisibility: ShowedItemsVisibility.onType,
           searchField: TextField(
             decoration: InputDecoration(
               hintText: 'Search countries',
@@ -135,38 +137,44 @@ class OverlayConstructorExample extends StatelessWidget {
           showSelectAllButton: true,
           maximumShowItemsHeight: 200,
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 150,
-                  height: 50,
-                  color: Colors.red,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 150,
-                  height: 50,
-                  color: Colors.yellow,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 150,
-                  height: 50,
-                  color: Colors.blue,
-                ),
-              ),
-            ],
-          ),
+        TextButton(
+          onPressed: () {
+            print(controller.getPickedItems());
+          },
+          child: Text('press'),
         ),
+        // Padding(
+        //   padding: const EdgeInsets.only(top: 20.0),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: [
+        //       Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: Container(
+        //           width: 150,
+        //           height: 50,
+        //           color: Colors.red,
+        //         ),
+        //       ),
+        //       Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: Container(
+        //           width: 150,
+        //           height: 50,
+        //           color: Colors.yellow,
+        //         ),
+        //       ),
+        //       Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: Container(
+        //           width: 150,
+        //           height: 50,
+        //           color: Colors.blue,
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }

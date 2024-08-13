@@ -123,38 +123,45 @@ class DefaultConstructorExample extends StatelessWidget {
           showSelectAllButton: true,
           maximumShowItemsHeight: 200,
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 150,
-                  height: 50,
-                  color: Colors.red,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 150,
-                  height: 50,
-                  color: Colors.yellow,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 150,
-                  height: 50,
-                  color: Colors.blue,
-                ),
-              ),
-            ],
-          ),
+        TextButton(
+          onPressed: () {
+            print(controller.getPickedItems());
+            print(controller.getPickedItems().isEmpty);
+          },
+          child: Text('press'),
         ),
+        // Padding(
+        //   padding: const EdgeInsets.only(top: 20.0),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: [
+        //       Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: Container(
+        //           width: 150,
+        //           height: 50,
+        //           color: Colors.red,
+        //         ),
+        //       ),
+        //       Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: Container(
+        //           width: 150,
+        //           height: 50,
+        //           color: Colors.yellow,
+        //         ),
+        //       ),
+        //       Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: Container(
+        //           width: 150,
+        //           height: 50,
+        //           color: Colors.blue,
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }
