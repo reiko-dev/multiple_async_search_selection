@@ -128,7 +128,7 @@ class DefaultConstructorExample extends StatelessWidget {
             print(controller.getPickedItems());
             print(controller.getPickedItems().isEmpty);
           },
-          child: Text('press'),
+          child: const Text('press'),
         ),
         // Padding(
         //   padding: const EdgeInsets.only(top: 20.0),

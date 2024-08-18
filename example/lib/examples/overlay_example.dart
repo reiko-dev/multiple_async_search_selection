@@ -141,7 +141,7 @@ class OverlayConstructorExample extends StatelessWidget {
           onPressed: () {
             print(controller.getPickedItems());
           },
-          child: Text('press'),
+          child: const Text('press'),
         ),
         // Padding(
         //   padding: const EdgeInsets.only(top: 20.0),

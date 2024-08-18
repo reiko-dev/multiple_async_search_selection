@@ -1372,7 +1372,6 @@ class _MultipleSearchSelectionState<T>
   void _onSearchFieldChanged(String value) {
     if (widget.controller?.minCharsToShowItems is int &&
         value.length < widget.controller!.minCharsToShowItems!) {
-      print('We should not show all items');
       showAllItems = false;
       setState(() {});
       return;
