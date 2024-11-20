@@ -2,8 +2,8 @@ import 'dart:developer';
 
 import 'package:example/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:multiple_search_selection/createable/create_options.dart';
-import 'package:multiple_search_selection/multiple_search_selection.dart';
+import 'package:multiple_async_search_selection/createable/create_options.dart';
+import 'package:multiple_async_search_selection/multiple_async_search_selection.dart';
 
 class CreatableConstructorExample extends StatelessWidget {
   const CreatableConstructorExample({
@@ -15,7 +15,7 @@ class CreatableConstructorExample extends StatelessWidget {
     MultipleSearchController controller = MultipleSearchController();
     return Column(
       children: [
-        MultipleSearchSelection<Country>.creatable(
+        MultipleAsyncSearchSelection<Country>.creatable(
           itemsVisibility: ShowedItemsVisibility.onType,
           searchField: TextField(
             decoration: InputDecoration(

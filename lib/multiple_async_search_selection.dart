@@ -1,13 +1,11 @@
 /// A highly customizable multiple selection widget with fuzzy search functionality
-// ignore_for_file: use_setters_to_change_properties
-
 library multiple_search_selection;
 
 import 'package:flutter/material.dart';
-import 'package:multiple_search_selection/createable/create_options.dart';
-import 'package:multiple_search_selection/helpers/jaro.dart';
-import 'package:multiple_search_selection/helpers/levenshtein.dart';
-import 'package:multiple_search_selection/overlay/overlay_options.dart';
+import 'package:multiple_async_search_selection/createable/create_options.dart';
+import 'package:multiple_async_search_selection/helpers/jaro.dart';
+import 'package:multiple_async_search_selection/helpers/levenshtein.dart';
+import 'package:multiple_async_search_selection/overlay/overlay_options.dart';
 
 enum FuzzySearch {
   levenshtein,
@@ -21,9 +19,9 @@ enum ShowedItemsVisibility {
   toggle,
 }
 
-class MultipleSearchSelection<T> extends StatefulWidget {
+class MultipleAsyncSearchSelection<T> extends StatefulWidget {
   // Default constructor
-  factory MultipleSearchSelection({
+  factory MultipleAsyncSearchSelection({
     required TextField searchField,
     required List<T> items,
     required Widget Function(T) pickedItemBuilder,
@@ -87,7 +85,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
           (controller?.minCharsToShowItems != null)),
       'itemsVisibility cannot be ShowedItemsVisibility.alwaysOn when minCharsToShowItems is not null on MultipleSearchController',
     );
-    return MultipleSearchSelection._(
+    return MultipleAsyncSearchSelection._(
       items: items,
       title: title,
       maxSelectedItems: maxSelectedItems,
@@ -156,7 +154,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
   /// [MultipleSearchSelection.creatable] constructor provides a way to add a new item in your list,
   ///
   /// after search doesn't return any results. You can pass
-  factory MultipleSearchSelection.creatable({
+  factory MultipleAsyncSearchSelection.creatable({
     required TextField searchField,
     required List<T> items,
     required Widget Function(T) pickedItemBuilder,
@@ -220,7 +218,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
           (controller?.minCharsToShowItems != null)),
       'itemsVisibility cannot be ShowedItemsVisibility.alwaysOn when minCharsToShowItems is not null on MultipleSearchController',
     );
-    return MultipleSearchSelection._(
+    return MultipleAsyncSearchSelection._(
       searchField: searchField,
       items: items,
       title: title,
@@ -289,7 +287,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
   /// [MultipleSearchSelection.overlay] is a widget that can be used to show the search results in an overlay.
   ///
   /// This is useful when you don't want the showed items to push the other widgets down.
-  factory MultipleSearchSelection.overlay({
+  factory MultipleAsyncSearchSelection.overlay({
     required TextField searchField,
     required List<T> items,
     required Widget Function(T) pickedItemBuilder,
@@ -359,7 +357,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
       !(itemsVisibility == ShowedItemsVisibility.toggle),
       'Toggle items visibility is not supported in overlay mode',
     );
-    return MultipleSearchSelection._(
+    return MultipleAsyncSearchSelection._(
       searchField: searchField,
       items: items,
       title: title,
@@ -427,7 +425,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
   }
 
   /// Private constructor
-  const MultipleSearchSelection._({
+  const MultipleAsyncSearchSelection._({
     required this.searchField,
     required this.fieldToCheck,
     required this.itemBuilder,
@@ -748,7 +746,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
   /// ```
   final OverlayOptions<T>? overlayOptions;
 
-  /// This is the controller for the [MultipleSearchSelection].
+  /// This is the controller for the [MultipleAsyncSearchSelection].
   ///
   /// Use this controller to :
   /// 1. getAllItems
@@ -771,12 +769,12 @@ class MultipleSearchSelection<T> extends StatefulWidget {
   final Function(String)? onSearchChanged;
 
   @override
-  _MultipleSearchSelectionState<T> createState() =>
-      _MultipleSearchSelectionState<T>();
+  _MultipleAsyncSearchSelectionState<T> createState() =>
+      _MultipleAsyncSearchSelectionState<T>();
 }
 
-class _MultipleSearchSelectionState<T>
-    extends State<MultipleSearchSelection<T>> {
+class _MultipleAsyncSearchSelectionState<T>
+    extends State<MultipleAsyncSearchSelection<T>> {
   late List<T> showedItems;
   late List<T> allItems;
   late List<T> pickedItems;
@@ -1652,7 +1650,7 @@ class _MultipleSearchSelectionState<T>
   }
 }
 
-/// This is the controller for the [MultipleSearchSelection].
+/// This is the controller for the [MultipleAsyncSearchSelection].
 ///
 /// Use this controller to :
 ///
