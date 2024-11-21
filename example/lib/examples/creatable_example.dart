@@ -50,7 +50,7 @@ class _CreatableConstructorExampleState
   Widget build(BuildContext context) {
     return MultipleAsyncSearchSelection<Country>.creatable(
       itemsVisibility: ShowedItemsVisibility.onType,
-      maxSelectedItems: 3,
+      maxSelectedItems: 10,
       onSearchChanged: (p0) async {
         return loadCountries(p0);
       },
@@ -67,7 +67,7 @@ class _CreatableConstructorExampleState
       ),
       createOptions: CreateOptions(
         create: (text) async {
-          await Future.delayed(const Duration(milliseconds: 2500));
+          await Future.delayed(const Duration(milliseconds: 500));
           return Country(name: text, iso: text);
         },
         validator: (country) => country.name.length > 2,
@@ -91,6 +91,11 @@ class _CreatableConstructorExampleState
       items: countries,
       initialPickedItems: initialItems,
       fieldToCheck: (c) => c.name,
+      pickedItemsContainerBuilder: (pickedItems) {
+        return Wrap(
+          children: pickedItems.map((e) => e).toList(),
+        );
+      },
       itemBuilder: (country, index, isPicked) {
         return Container(
           decoration: BoxDecoration(
@@ -99,8 +104,8 @@ class _CreatableConstructorExampleState
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              vertical: 20.0,
-              horizontal: 12,
+              vertical: 12.0,
+              horizontal: 8,
             ),
             child: Text(country.name),
           ),
@@ -113,7 +118,7 @@ class _CreatableConstructorExampleState
             border: Border.all(color: Colors.grey[400]!),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
             child: Text(country.name),
           ),
         );

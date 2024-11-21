@@ -1672,9 +1672,9 @@ class _MultipleAsyncSearchSelectionState<T>
                 ],
               ),
             ],
-            const SizedBox(
-              height: 10,
-            ),
+            pickedItems.isEmpty || maxItemsSelected
+                ? const SizedBox(height: 0)
+                : const SizedBox(height: 8),
             if (widget.itemsVisibility != ShowedItemsVisibility.toggle &&
                 widget.isOverlay) ...[
               Column(
