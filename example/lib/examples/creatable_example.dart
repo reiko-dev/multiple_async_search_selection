@@ -5,175 +5,120 @@ import 'package:flutter/material.dart';
 import 'package:multiple_async_search_selection/createable/create_options.dart';
 import 'package:multiple_async_search_selection/multiple_async_search_selection.dart';
 
-class CreatableConstructorExample extends StatelessWidget {
+class CreatableConstructorExample extends StatefulWidget {
   const CreatableConstructorExample({
     Key? key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    MultipleSearchController controller = MultipleSearchController();
-    return Column(
-      children: [
-        MultipleAsyncSearchSelection<Country>.creatable(
-          itemsVisibility: ShowedItemsVisibility.onType,
-          searchField: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search countries',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
-            ),
-          ),
-          createOptions: CreateOptions(
-            create: (text) {
-              return Country(name: text, iso: text);
-            },
-            validator: (country) {
-              return country.name.length > 2;
-            },
-            onDuplicate: (item) {
-              log('Duplicate item $item');
-            },
-            allowDuplicates: false,
-            onCreated: (c) => log('Country ${c.name} created'),
-            createBuilder: (text) => Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('Create "$text"'),
-              ),
-            ),
-            pickCreated: true,
-          ),
-          controller: controller,
+  State<CreatableConstructorExample> createState() =>
+      _CreatableConstructorExampleState();
+}
 
-          title: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text(
-              'Countries',
-              style: kStyleDefault.copyWith(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+class _CreatableConstructorExampleState
+    extends State<CreatableConstructorExample> {
+  static late final allCountries = List<Country>.generate(
+    countryNames.length,
+    (index) => Country(
+      name: countryNames[index],
+      iso: countryNames[index].substring(0, 2),
+    ),
+  );
+
+  final controller = MultipleSearchController<Country>();
+
+  late var countries = <Country>[];
+
+  Future<List<Country>> loadCountries(String text) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    final match = allCountries
+        .where((c) => c.name.toLowerCase().contains(text.toLowerCase()))
+        .take(10)
+        .toList();
+
+    return match;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MultipleAsyncSearchSelection<Country>.creatable(
+      itemsVisibility: ShowedItemsVisibility.onType,
+      maxSelectedItems: 3,
+      onSearchChanged: (p0) async {
+        return loadCountries(p0);
+      },
+      searchField: TextField(
+        decoration: InputDecoration(
+          hintText: 'Procure por cargos...',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(6),
           ),
-          onItemAdded: (c) {
-            controller.getAllItems();
-            controller.getPickedItems();
-          },
-          clearSearchFieldOnSelect: true,
-          items: countries, // List<Country>
-          fieldToCheck: (c) {
-            return c.name;
-          },
-          itemBuilder: (country, index, isPicked) {
-            return Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  color: Colors.white,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 20.0,
-                    horizontal: 12,
-                  ),
-                  child: Text(country.name),
-                ),
-              ),
-            );
-          },
-          pickedItemBuilder: (country) {
-            return Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey[400]!),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text(country.name),
-              ),
-            );
-          },
-          sortShowedItems: true,
-          sortPickedItems: true,
-          selectAllButton: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.blue),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Select All',
-                  style: kStyleDefault,
-                ),
-              ),
-            ),
-          ),
-          clearAllButton: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.red),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Clear All',
-                  style: kStyleDefault,
-                ),
-              ),
-            ),
-          ),
-          caseSensitiveSearch: false,
-          fuzzySearch: FuzzySearch.none,
-          showSelectAllButton: true,
-          maximumShowItemsHeight: 200,
         ),
-        TextButton(
-          onPressed: () {
-            print(controller.getPickedItems());
-            print(controller.getPickedItems().isEmpty);
-          },
-          child: const Text('press'),
+      ),
+      createOptions: CreateOptions(
+        create: (text) {
+          return Country(name: text, iso: text);
+        },
+        validator: (country) => country.name.length > 2,
+        allowDuplicates: false,
+        onCreated: (c) => log('Country ${c.name} created'),
+        createBuilder: (text) => Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text('Adicionar "$text"'),
+          ),
         ),
-        // Padding(
-        //   padding: const EdgeInsets.only(top: 20.0),
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     children: [
-        //       Padding(
-        //         padding: const EdgeInsets.all(8.0),
-        //         child: Container(
-        //           width: 150,
-        //           height: 50,
-        //           color: Colors.red,
-        //         ),
-        //       ),
-        //       Padding(
-        //         padding: const EdgeInsets.all(8.0),
-        //         child: Container(
-        //           width: 150,
-        //           height: 50,
-        //           color: Colors.yellow,
-        //         ),
-        //       ),
-        //       Padding(
-        //         padding: const EdgeInsets.all(8.0),
-        //         child: Container(
-        //           width: 150,
-        //           height: 50,
-        //           color: Colors.blue,
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // ),
-      ],
+        pickCreated: true,
+      ),
+      controller: controller,
+      onItemAdded: (c) {
+        controller.getAllItems();
+        controller.getPickedItems();
+      },
+      clearSearchFieldOnSelect: true,
+      items: countries,
+      fieldToCheck: (c) => c.name,
+      itemBuilder: (country, index, isPicked) {
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(6),
+            color: Colors.white,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 20.0,
+              horizontal: 12,
+            ),
+            child: Text(country.name),
+          ),
+        );
+      },
+      pickedItemBuilder: (country) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.grey[400]!),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Text(country.name),
+          ),
+        );
+      },
+      sortShowedItems: true,
+      sortPickedItems: true,
+      caseSensitiveSearch: false,
+      fuzzySearch: FuzzySearch.none,
+      showSelectAllButton: false,
+      showClearAllButton: false,
+      maximumShowItemsHeight: 200,
+      noResultsWidget: const Text('Sem resultados'),
+      showItemsButton: const Text('Exibir todos os items'),
+      hintText: 'Sem resultados',
+      pickedItemSpacing: 4,
+      hideOnMaxSelected: true,
+      showedItemContainerPadding: EdgeInsets.zero,
     );
   }
 }

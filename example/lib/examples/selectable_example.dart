@@ -33,8 +33,9 @@ class SelectableExample extends StatelessWidget {
               ),
             ),
           ),
-          onSearchChanged: (text) {
+          onSearchChanged: (text) async {
             log('Text is $text');
+            return [];
           },
           controller: controller,
           itemsVisibility: ShowedItemsVisibility.onType,
