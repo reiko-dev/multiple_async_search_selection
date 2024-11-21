@@ -1236,10 +1236,15 @@ class _MultipleAsyncSearchSelectionState<T>
     setState(() {});
   }
 
-  void _onCreateItem() {
+  Future<void> _onCreateItem() async {
     if (widget.isCreatable) {
-      final T itemToAdd =
-          widget.createOptions!.create(_searchFieldTextEditingController.text);
+      isLoading.value = true;
+
+      final T itemToAdd = await widget.createOptions!
+          .create(_searchFieldTextEditingController.text);
+
+      isLoading.value = false;
+
       if (!(widget.createOptions?.validator.call(itemToAdd) ?? false)) {
         return;
       }
@@ -1274,7 +1279,7 @@ class _MultipleAsyncSearchSelectionState<T>
       setState(() {});
     } else if (widget.isOverlay &&
         widget.overlayOptions?.canCreateItem == true) {
-      final T itemToAdd = widget.overlayOptions!.createOptions!
+      final T itemToAdd = await widget.overlayOptions!.createOptions!
           .create(_searchFieldTextEditingController.text);
 
       if (allItems.contains(itemToAdd) || pickedItems.contains(itemToAdd)) {

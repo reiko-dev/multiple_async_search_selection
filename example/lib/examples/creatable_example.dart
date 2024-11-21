@@ -56,7 +56,7 @@ class _CreatableConstructorExampleState
         ),
       ),
       createOptions: CreateOptions(
-        create: (text) {
+        create: (text) async {
           return Country(name: text, iso: text);
         },
         validator: (country) => country.name.length > 2,

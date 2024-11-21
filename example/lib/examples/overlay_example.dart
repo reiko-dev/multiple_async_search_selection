@@ -31,7 +31,7 @@ class OverlayConstructorExample extends StatelessWidget {
             closeOnItemSelected: false,
             canCreateItem: true,
             createOptions: CreateOptions(
-              create: (text) {
+              create: (text) async {
                 return Country(name: text, iso: text);
               },
               onDuplicate: (item) {
