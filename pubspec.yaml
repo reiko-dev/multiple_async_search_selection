@@ -1,6 +1,7 @@
 name: multiple_async_search_selection
 description: Clone of multiple_search_selection - A highly customizable multiple selection widget with fuzzy and async search functionality.
 version: 0.0.3
+
 homepage: "https://github.com/esentis/multiple_search_selection"
 topics:
   - multiple-search
