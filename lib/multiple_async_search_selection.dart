@@ -1747,18 +1747,19 @@ class _MultipleAsyncSearchSelectionState<T>
           ],
         ),
         Positioned.fill(
-            child: IgnorePointer(
-          child: ValueListenableBuilder<bool>(
-            valueListenable: isLoading,
-            builder: (context, value, child) {
-              if (!value) return const SizedBox.shrink();
+          child: IgnorePointer(
+            child: ValueListenableBuilder<bool>(
+              valueListenable: isLoading,
+              builder: (context, value, child) {
+                if (!value) return const SizedBox.shrink();
 
-              return child!;
-            },
-            child: widget.loadingWidget ??
-                const Center(child: CircularProgressIndicator()),
+                return child!;
+              },
+              child: widget.loadingWidget ??
+                  const Center(child: CircularProgressIndicator()),
+            ),
           ),
-        )),
+        ),
       ],
     );
   }
