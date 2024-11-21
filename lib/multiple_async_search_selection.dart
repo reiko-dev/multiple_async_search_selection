@@ -1,13 +1,13 @@
 /// A highly customizable multiple selection widget with fuzzy search functionality
-// ignore_for_file: use_setters_to_change_properties
+// ignore_for_file: avoid_setters_without_getters
 
 library multiple_search_selection;
 
 import 'package:flutter/material.dart';
-import 'package:multiple_search_selection/createable/create_options.dart';
-import 'package:multiple_search_selection/helpers/jaro.dart';
-import 'package:multiple_search_selection/helpers/levenshtein.dart';
-import 'package:multiple_search_selection/overlay/overlay_options.dart';
+import 'package:multiple_async_search_selection/createable/create_options.dart';
+import 'package:multiple_async_search_selection/helpers/jaro.dart';
+import 'package:multiple_async_search_selection/helpers/levenshtein.dart';
+import 'package:multiple_async_search_selection/overlay/overlay_options.dart';
 
 enum FuzzySearch {
   levenshtein,
@@ -21,9 +21,9 @@ enum ShowedItemsVisibility {
   toggle,
 }
 
-class MultipleSearchSelection<T> extends StatefulWidget {
+class MultipleAsyncSearchSelection<T> extends StatefulWidget {
   // Default constructor
-  factory MultipleSearchSelection({
+  factory MultipleAsyncSearchSelection({
     required TextField searchField,
     required List<T> items,
     required Widget Function(T) pickedItemBuilder,
@@ -80,14 +80,16 @@ class MultipleSearchSelection<T> extends StatefulWidget {
     int? maxSelectedItems,
     bool? placePickedItemContainerBelow,
     MultipleSearchController? controller,
-    Function(String)? onSearchChanged,
+    Future<List<T>> Function(String)? onSearchChanged,
+    bool hideOnMaxSelected = false,
+    Widget? loadingWidget,
   }) {
     assert(
       !(itemsVisibility == ShowedItemsVisibility.alwaysOn &&
           (controller?.minCharsToShowItems != null)),
       'itemsVisibility cannot be ShowedItemsVisibility.alwaysOn when minCharsToShowItems is not null on MultipleSearchController',
     );
-    return MultipleSearchSelection._(
+    return MultipleAsyncSearchSelection._(
       items: items,
       title: title,
       maxSelectedItems: maxSelectedItems,
@@ -150,13 +152,15 @@ class MultipleSearchSelection<T> extends StatefulWidget {
       controller: controller ?? MultipleSearchController(),
       searchField: searchField,
       onSearchChanged: onSearchChanged,
+      hideOnMaxSelected: hideOnMaxSelected,
+      loadingWidget: loadingWidget,
     );
   }
 
   /// [MultipleSearchSelection.creatable] constructor provides a way to add a new item in your list,
   ///
   /// after search doesn't return any results. You can pass
-  factory MultipleSearchSelection.creatable({
+  factory MultipleAsyncSearchSelection.creatable({
     required TextField searchField,
     required List<T> items,
     required Widget Function(T) pickedItemBuilder,
@@ -213,14 +217,17 @@ class MultipleSearchSelection<T> extends StatefulWidget {
     int? maxSelectedItems,
     bool? placePickedItemContainerBelow,
     MultipleSearchController? controller,
-    Function(String)? onSearchChanged,
+    Future<List<T>> Function(String)? onSearchChanged,
+    Widget? noResultsWidget,
+    bool hideOnMaxSelected = false,
+    Widget? loadingWidget,
   }) {
     assert(
       !(itemsVisibility == ShowedItemsVisibility.alwaysOn &&
           (controller?.minCharsToShowItems != null)),
       'itemsVisibility cannot be ShowedItemsVisibility.alwaysOn when minCharsToShowItems is not null on MultipleSearchController',
     );
-    return MultipleSearchSelection._(
+    return MultipleAsyncSearchSelection._(
       searchField: searchField,
       items: items,
       title: title,
@@ -283,13 +290,16 @@ class MultipleSearchSelection<T> extends StatefulWidget {
       placePickedItemContainerBelow: placePickedItemContainerBelow ?? false,
       controller: controller ?? MultipleSearchController(),
       onSearchChanged: onSearchChanged,
+      noResultsWidget: noResultsWidget,
+      hideOnMaxSelected: hideOnMaxSelected,
+      loadingWidget: loadingWidget,
     );
   }
 
   /// [MultipleSearchSelection.overlay] is a widget that can be used to show the search results in an overlay.
   ///
   /// This is useful when you don't want the showed items to push the other widgets down.
-  factory MultipleSearchSelection.overlay({
+  factory MultipleAsyncSearchSelection.overlay({
     required TextField searchField,
     required List<T> items,
     required Widget Function(T) pickedItemBuilder,
@@ -347,7 +357,9 @@ class MultipleSearchSelection<T> extends StatefulWidget {
     bool? placePickedItemContainerBelow,
     MultipleSearchController? controller,
     ShowedItemsVisibility? itemsVisibility,
-    Function(String)? onSearchChanged,
+    Future<List<T>> Function(String)? onSearchChanged,
+    bool hideOnMaxSelected = false,
+    Widget? loadingWidget,
   }) {
     // Assertion to ensure the condition is met
     assert(
@@ -359,7 +371,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
       !(itemsVisibility == ShowedItemsVisibility.toggle),
       'Toggle items visibility is not supported in overlay mode',
     );
-    return MultipleSearchSelection._(
+    return MultipleAsyncSearchSelection._(
       searchField: searchField,
       items: items,
       title: title,
@@ -423,11 +435,13 @@ class MultipleSearchSelection<T> extends StatefulWidget {
       placePickedItemContainerBelow: placePickedItemContainerBelow ?? false,
       controller: controller ?? MultipleSearchController(),
       onSearchChanged: onSearchChanged,
+      hideOnMaxSelected: hideOnMaxSelected,
+      loadingWidget: loadingWidget,
     );
   }
 
   /// Private constructor
-  const MultipleSearchSelection._({
+  const MultipleAsyncSearchSelection._({
     required this.searchField,
     required this.fieldToCheck,
     required this.itemBuilder,
@@ -489,6 +503,8 @@ class MultipleSearchSelection<T> extends StatefulWidget {
     this.placePickedItemContainerBelow = false,
     this.controller,
     this.onSearchChanged,
+    required this.hideOnMaxSelected,
+    required this.loadingWidget,
   });
 
   /// The maximum number of items that can be picked. If null, there is no limit.
@@ -748,7 +764,7 @@ class MultipleSearchSelection<T> extends StatefulWidget {
   /// ```
   final OverlayOptions<T>? overlayOptions;
 
-  /// This is the controller for the [MultipleSearchSelection].
+  /// This is the controller for the [MultipleAsyncSearchSelection].
   ///
   /// Use this controller to :
   /// 1. getAllItems
@@ -768,15 +784,21 @@ class MultipleSearchSelection<T> extends StatefulWidget {
 
   /// Since the `onChanged` of the `searchField` is used internally to search items,
   /// you can use this callback to get the search query.
-  final Function(String)? onSearchChanged;
+  final Future<List<T>> Function(String)? onSearchChanged;
+
+  /// Flag related to the TextField, whether we should hide it when
+  /// achieving the maxnumber of selected options or not.
+  final bool hideOnMaxSelected;
+
+  final Widget? loadingWidget;
 
   @override
-  _MultipleSearchSelectionState<T> createState() =>
-      _MultipleSearchSelectionState<T>();
+  _MultipleAsyncSearchSelectionState<T> createState() =>
+      _MultipleAsyncSearchSelectionState<T>();
 }
 
-class _MultipleSearchSelectionState<T>
-    extends State<MultipleSearchSelection<T>> {
+class _MultipleAsyncSearchSelectionState<T>
+    extends State<MultipleAsyncSearchSelection<T>> {
   late List<T> showedItems;
   late List<T> allItems;
   late List<T> pickedItems;
@@ -792,10 +814,84 @@ class _MultipleSearchSelectionState<T>
   late TextEditingController _searchFieldTextEditingController;
   late FocusNode _searchFieldFocusNode;
 
+  final isLoading = ValueNotifier(false);
+
+  @override
+  void initState() {
+    super.initState();
+
+    _init();
+  }
+
+  @override
+  void didUpdateWidget(MultipleAsyncSearchSelection<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.items != widget.items) {
+      _init();
+    }
+  }
+
+  void _init() {
+    _prepareItems();
+
+    _showedItemsScrollController =
+        widget.showedItemsScrollController ?? ScrollController();
+
+    showAllItems = widget.itemsVisibility == ShowedItemsVisibility.alwaysOn;
+
+    widget.controller?._setClearAllPickedItemsCallback = _clearAllPickedItems;
+    widget.controller?._setSelectAllItemsCallback = _selectAllItems;
+    widget.controller?._setClearSearchFieldCallback = _onClearSearchField;
+    widget.controller?._setGetAllItemsCallback = () => allItems;
+    widget.controller?._setGetPickedItemsCallback = () => pickedItems;
+    widget.controller?._setSearchItemsCallback = _searchAllItems;
+
+    _searchFieldTextEditingController =
+        widget.searchField.controller ?? TextEditingController();
+    _searchFieldFocusNode = widget.searchField.focusNode ?? FocusNode();
+
+    if (widget.isOverlay) {
+      _overlayPortalController = OverlayPortalController();
+      widget.overlayOptions?.closeOverlay = () {
+        _overlayPortalController.hide();
+      };
+
+      widget.overlayOptions?.showOverlay = () {
+        _overlayPortalController.show();
+      };
+
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        _searchFieldFocusNode.addListener(() {
+          if (_searchFieldFocusNode.hasFocus) {
+            _overlayPortalController.show();
+          }
+        });
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchFieldTextEditingController.dispose();
+    _searchFieldFocusNode.dispose();
+    widget.controller?._setClearSearchFieldCallback = null;
+    widget.controller?._setSelectAllItemsCallback = null;
+    widget.controller?._setClearAllPickedItemsCallback = null;
+    widget.controller?._setGetAllItemsCallback = null;
+    widget.controller?._setGetPickedItemsCallback = null;
+    widget.controller?._setSearchItemsCallback = null;
+
+    super.dispose();
+  }
+
   Widget _searchField({
     required bool maxItemsSelected,
     required void Function(String)? onChanged,
   }) {
+    if (widget.hideOnMaxSelected && maxItemsSelected) {
+      return const SizedBox.shrink();
+    }
+
     return TextField(
       key: _searchFieldKey,
       enabled: !maxItemsSelected,
@@ -876,71 +972,76 @@ class _MultipleSearchSelectionState<T>
           _overlayPortalController.hide();
         }
       },
-      child: ListView.builder(
-        padding: EdgeInsets.zero,
-        primary: false,
-        shrinkWrap: true,
-        cacheExtent: 900,
-        addAutomaticKeepAlives: false,
+      child: Scrollbar(
+        thumbVisibility: true,
+        trackVisibility: true,
         controller: _showedItemsScrollController,
-        itemCount: showedItems.isEmpty ? 1 : showedItems.length,
-        itemExtent: widget.showedItemExtent,
-        itemBuilder: (context, index) {
-          if ((showedItems.isEmpty && allItems.isNotEmpty) ||
-              (showedItems.isEmpty && allItems.isEmpty)) {
-            return (widget.isCreatable ||
-                        (widget.overlayOptions?.canCreateItem ?? false)) &&
-                    _searchFieldTextEditingController.text.isNotEmpty
-                ? GestureDetector(
-                    onTap: _onCreateItem,
-                    child: AbsorbPointer(
-                      child: widget.createOptions?.createBuilder(
-                            _searchFieldTextEditingController.text,
-                          ) ??
-                          widget.overlayOptions?.createOptions!.createBuilder
-                              .call(
-                            _searchFieldTextEditingController.text,
+        child: ListView.builder(
+          padding: EdgeInsets.zero,
+          primary: false,
+          shrinkWrap: true,
+          cacheExtent: 900,
+          addAutomaticKeepAlives: false,
+          controller: _showedItemsScrollController,
+          itemCount: showedItems.isEmpty ? 1 : showedItems.length,
+          itemExtent: widget.showedItemExtent,
+          itemBuilder: (context, index) {
+            if ((showedItems.isEmpty && allItems.isNotEmpty) ||
+                (showedItems.isEmpty && allItems.isEmpty)) {
+              return (widget.isCreatable ||
+                          (widget.overlayOptions?.canCreateItem ?? false)) &&
+                      _searchFieldTextEditingController.text.isNotEmpty
+                  ? GestureDetector(
+                      onTap: _onCreateItem,
+                      child: AbsorbPointer(
+                        child: widget.createOptions?.createBuilder(
+                              _searchFieldTextEditingController.text,
+                            ) ??
+                            widget.overlayOptions?.createOptions!.createBuilder
+                                .call(
+                              _searchFieldTextEditingController.text,
+                            ),
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(6.0),
+                      child: widget.noResultsWidget ??
+                          const Text(
+                            'No results',
                           ),
+                    );
+            }
+
+            final item = showedItems[index];
+            final bool isPicked = pickedItems.contains(item);
+
+            return widget.isOverlay
+                ? GestureDetector(
+                    onTap: () async {
+                      _onAddItem(item);
+                    },
+                    child: AbsorbPointer(
+                      child: widget.itemBuilder(
+                        item,
+                        index,
+                        isPicked,
+                      ),
                     ),
                   )
-                : Padding(
-                    padding: const EdgeInsets.all(6.0),
-                    child: widget.noResultsWidget ??
-                        const Text(
-                          'No results',
-                        ),
+                : GestureDetector(
+                    onTap: () {
+                      _onAddItem(item);
+                    },
+                    child: AbsorbPointer(
+                      child: widget.itemBuilder(
+                        item,
+                        index,
+                        isPicked,
+                      ),
+                    ),
                   );
-          }
-
-          final item = showedItems[index];
-          final bool isPicked = pickedItems.contains(item);
-
-          return widget.isOverlay
-              ? GestureDetector(
-                  onTap: () async {
-                    _onAddItem(item);
-                  },
-                  child: AbsorbPointer(
-                    child: widget.itemBuilder(
-                      item,
-                      index,
-                      isPicked,
-                    ),
-                  ),
-                )
-              : GestureDetector(
-                  onTap: () {
-                    _onAddItem(item);
-                  },
-                  child: AbsorbPointer(
-                    child: widget.itemBuilder(
-                      item,
-                      index,
-                      isPicked,
-                    ),
-                  ),
-                );
-        },
+          },
+        ),
       ),
     );
   }
@@ -1207,6 +1308,42 @@ class _MultipleSearchSelectionState<T>
     }
   }
 
+  void _addItems(List<T>? items) {
+    if (items == null) return;
+
+    bool addAll = true;
+
+    if (widget.isCreatable) {
+      if (!widget.createOptions!.allowDuplicates) {
+        addAll = false;
+      }
+    } else {
+      if (!widget.overlayOptions!.createOptions!.allowDuplicates) {
+        addAll = false;
+      }
+    }
+    if (addAll) {
+      allItems.addAll(items);
+    } else {
+      final missingItens = <T>[];
+
+      for (final i in items) {
+        if (allItems.contains(i)) continue;
+        missingItens.add(i);
+      }
+
+      allItems.addAll(missingItens);
+    }
+
+    showedItems = allItems;
+    if (widget.itemsVisibility == ShowedItemsVisibility.onType &&
+        _searchFieldTextEditingController.text.isEmpty) {
+      showAllItems = false;
+    }
+
+    setState(() {});
+  }
+
   void _onClearSearchField() {
     if (_searchFieldTextEditingController.text.isNotEmpty) {
       _searchFieldTextEditingController.clear();
@@ -1369,14 +1506,19 @@ class _MultipleSearchSelectionState<T>
     ];
   }
 
-  void _onSearchFieldChanged(String value) {
+  Future<void> _onSearchFieldChanged(String value) async {
     if (widget.controller?.minCharsToShowItems is int &&
         value.length < widget.controller!.minCharsToShowItems!) {
       showAllItems = false;
       setState(() {});
       return;
     }
-    widget.onSearchChanged?.call(value);
+
+    isLoading.value = true;
+    final newItems = await widget.onSearchChanged?.call(value);
+    isLoading.value = false;
+
+    _addItems(newItems);
     showedItems = _searchAllItems(value);
     if (widget.itemsVisibility == ShowedItemsVisibility.onType) {
       showAllItems = widget.itemsVisibility == ShowedItemsVisibility.onType &&
@@ -1386,273 +1528,235 @@ class _MultipleSearchSelectionState<T>
   }
 
   @override
-  void initState() {
-    super.initState();
-
-    _prepareItems();
-
-    _showedItemsScrollController =
-        widget.showedItemsScrollController ?? ScrollController();
-
-    showAllItems = widget.itemsVisibility == ShowedItemsVisibility.alwaysOn;
-
-    widget.controller?._setClearAllPickedItemsCallback(_clearAllPickedItems);
-    widget.controller?._setSelectAllItemsCallback(_selectAllItems);
-    widget.controller?._setClearSearchFieldCallback(_onClearSearchField);
-    widget.controller?._setGetAllItemsCallback(() => allItems);
-    widget.controller?._setGetPickedItemsCallback(() => pickedItems);
-    widget.controller?._setSearchItemsCallback(_searchAllItems);
-
-    _searchFieldTextEditingController =
-        widget.searchField.controller ?? TextEditingController();
-    _searchFieldFocusNode = widget.searchField.focusNode ?? FocusNode();
-
-    if (widget.isOverlay) {
-      _overlayPortalController = OverlayPortalController();
-      widget.overlayOptions?.closeOverlay = () {
-        _overlayPortalController.hide();
-      };
-
-      widget.overlayOptions?.showOverlay = () {
-        _overlayPortalController.show();
-      };
-
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        _searchFieldFocusNode.addListener(() {
-          if (_searchFieldFocusNode.hasFocus) {
-            _overlayPortalController.show();
-          }
-        });
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _searchFieldTextEditingController.dispose();
-    _searchFieldFocusNode.dispose();
-    widget.controller?._setClearSearchFieldCallback(null);
-    widget.controller?._setSelectAllItemsCallback(null);
-    widget.controller?._setClearAllPickedItemsCallback(null);
-    widget.controller?._setGetAllItemsCallback(null);
-    widget.controller?._setGetPickedItemsCallback(null);
-    widget.controller?._setSearchItemsCallback(null);
-
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final bool maxItemsSelected = widget.maxSelectedItems != null &&
         (widget.maxSelectedItems!) <= pickedItems.length;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
       children: [
-        if (widget.title != null) widget.title!,
-        ..._pickedItemsBuilder(
-          context,
-          widget.placePickedItemContainerBelow == false,
-        ),
-        if ((widget.showClearAllButton ?? true) ||
-            widget.itemsVisibility == ShowedItemsVisibility.toggle) ...[
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.title != null) widget.title!,
+            ..._pickedItemsBuilder(
+              context,
+              widget.placePickedItemContainerBelow == false,
+            ),
+            if ((widget.showClearAllButton ?? true) ||
+                widget.itemsVisibility == ShowedItemsVisibility.toggle) ...[
+              const SizedBox(
+                height: 10,
+              ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (widget.itemsVisibility ==
-                      ShowedItemsVisibility.toggle) ...[
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        widget.onTapShowItems?.call();
-                        showDialog(
-                          context: context,
-                          builder: (context) => StatefulBuilder(
-                            builder: (context, stateSetter) {
-                              return Dialog(
-                                backgroundColor: Colors.white,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _searchField(
-                                      maxItemsSelected: maxItemsSelected,
-                                      onChanged: (value) {
-                                        _onSearchFieldChanged(value);
-                                        stateSetter(() {});
-                                      },
-                                    ),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                        maxHeight:
-                                            widget.maximumShowItemsHeight,
-                                      ),
-                                      decoration: widget
-                                              .showedItemsBoxDecoration ??
-                                          BoxDecoration(
-                                            color: Colors.grey.withOpacity(0.1),
-                                            border: Border(
-                                              bottom: BorderSide(
-                                                color: Colors.grey
-                                                    .withOpacity(0.5),
-                                              ),
-                                              left: BorderSide(
-                                                color: Colors.grey
-                                                    .withOpacity(0.5),
-                                              ),
-                                              right: BorderSide(
-                                                color: Colors.grey
-                                                    .withOpacity(0.5),
-                                              ),
-                                            ),
-                                          ),
-                                      child: ScrollConfiguration(
-                                        behavior:
-                                            ScrollConfiguration.of(context)
-                                                .copyWith(
-                                          scrollbars: false,
+                  Row(
+                    children: [
+                      if (widget.itemsVisibility ==
+                          ShowedItemsVisibility.toggle) ...[
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            widget.onTapShowItems?.call();
+                            showDialog(
+                              context: context,
+                              builder: (context) => StatefulBuilder(
+                                builder: (context, stateSetter) {
+                                  return Dialog(
+                                    backgroundColor: Colors.white,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        _searchField(
+                                          maxItemsSelected: maxItemsSelected,
+                                          onChanged: (value) {
+                                            _onSearchFieldChanged(value);
+                                            stateSetter(() {});
+                                          },
                                         ),
-                                        child: _buildShowedItems(),
-                                      ),
+                                        Container(
+                                          constraints: BoxConstraints(
+                                            maxHeight:
+                                                widget.maximumShowItemsHeight,
+                                          ),
+                                          decoration:
+                                              widget.showedItemsBoxDecoration ??
+                                                  BoxDecoration(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.1),
+                                                    border: Border(
+                                                      bottom: BorderSide(
+                                                        color: Colors.grey
+                                                            .withOpacity(0.5),
+                                                      ),
+                                                      left: BorderSide(
+                                                        color: Colors.grey
+                                                            .withOpacity(0.5),
+                                                      ),
+                                                      right: BorderSide(
+                                                        color: Colors.grey
+                                                            .withOpacity(0.5),
+                                                      ),
+                                                    ),
+                                                  ),
+                                          child: ScrollConfiguration(
+                                            behavior:
+                                                ScrollConfiguration.of(context)
+                                                    .copyWith(
+                                              scrollbars: false,
+                                            ),
+                                            child: _buildShowedItems(),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              );
-                            },
+                                  );
+                                },
+                              ),
+                            ).whenComplete(() {
+                              _searchFieldTextEditingController.clear();
+                              showedItems = allItems;
+                            });
+                          },
+                          child: IgnorePointer(
+                            child: maxItemsSelected
+                                ? const SizedBox()
+                                : widget.showItemsButton ??
+                                    const Text('Show items'),
                           ),
-                        ).whenComplete(() {
-                          _searchFieldTextEditingController.clear();
-                          showedItems = allItems;
-                        });
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                      ],
+                      if (widget.maxSelectedItems == null)
+                        if (widget.showSelectAllButton ?? true)
+                          TapRegion(
+                            onTapInside: (event) {
+                              if (widget.isOverlay) {
+                                _overlayPortalController.show();
+                              }
+                            },
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: _selectAllItems,
+                              child: IgnorePointer(
+                                child: widget.selectAllButton ??
+                                    const Text('Select all'),
+                              ),
+                            ),
+                          ),
+                    ],
+                  ),
+                  if (pickedItems.isNotEmpty &&
+                      (widget.showClearAllButton ?? true))
+                    TapRegion(
+                      onTapInside: (event) {
+                        if (widget.isOverlay) {
+                          _overlayPortalController.show();
+                        }
                       },
-                      child: IgnorePointer(
-                        child: maxItemsSelected
-                            ? const SizedBox()
-                            : widget.showItemsButton ??
-                                const Text('Show items'),
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _clearAllPickedItems,
+                        child: IgnorePointer(
+                          child:
+                              widget.clearAllButton ?? const Text('Clear all'),
+                        ),
                       ),
                     ),
-                    const SizedBox(
-                      width: 10,
+                ],
+              ),
+            ],
+            const SizedBox(
+              height: 10,
+            ),
+            if (widget.itemsVisibility != ShowedItemsVisibility.toggle &&
+                widget.isOverlay) ...[
+              Column(
+                children: [
+                  CompositedTransformTarget(
+                    link: _layerLink,
+                    child: TapRegion(
+                      onTapInside: (event) {
+                        _overlayPortalController.show();
+                      },
+                      child: _searchField(
+                        maxItemsSelected: maxItemsSelected,
+                        onChanged: _onSearchFieldChanged,
+                      ),
                     ),
-                  ],
-                  if (widget.maxSelectedItems == null)
-                    if (widget.showSelectAllButton ?? true)
-                      TapRegion(
-                        onTapInside: (event) {
-                          if (widget.isOverlay) {
-                            _overlayPortalController.show();
-                          }
-                        },
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: _selectAllItems,
-                          child: IgnorePointer(
-                            child: widget.selectAllButton ??
-                                const Text('Select all'),
+                  ),
+                  _overlayedShowedItems(),
+                ],
+              ),
+            ],
+            if (widget.itemsVisibility != ShowedItemsVisibility.toggle &&
+                !widget.isOverlay) ...[
+              _searchField(
+                maxItemsSelected: maxItemsSelected,
+                onChanged: _onSearchFieldChanged,
+              ),
+              if (showAllItems)
+                Container(
+                  constraints: BoxConstraints(
+                    maxHeight: widget.maximumShowItemsHeight,
+                  ),
+                  decoration: widget.showedItemsBoxDecoration ??
+                      BoxDecoration(
+                        color: Colors.grey.withOpacity(0.1),
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey.withOpacity(0.5),
+                          ),
+                          left: BorderSide(
+                            color: Colors.grey.withOpacity(0.5),
+                          ),
+                          right: BorderSide(
+                            color: Colors.grey.withOpacity(0.5),
                           ),
                         ),
                       ),
-                ],
-              ),
-              if (pickedItems.isNotEmpty && (widget.showClearAllButton ?? true))
-                TapRegion(
-                  onTapInside: (event) {
-                    if (widget.isOverlay) {
-                      _overlayPortalController.show();
-                    }
-                  },
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: _clearAllPickedItems,
-                    child: IgnorePointer(
-                      child: widget.clearAllButton ?? const Text('Clear all'),
+                  child: RawScrollbar(
+                    controller: _showedItemsScrollController,
+                    thumbColor: widget.showedItemsScrollbarColor,
+                    thickness: widget.showedItemsScrollbarMinThumbLength ?? 10,
+                    minThumbLength:
+                        widget.showedItemsScrollbarMinThumbLength ?? 30,
+                    minOverscrollLength:
+                        widget.showedItemsScrollbarMinOverscrollLength ?? 5,
+                    radius: widget.showedItemsScrollbarRadius ??
+                        const Radius.circular(5),
+                    thumbVisibility: widget.showShowedItemsScrollbar,
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context)
+                          .copyWith(scrollbars: false),
+                      child: _buildShowedItems(),
                     ),
                   ),
                 ),
             ],
-          ),
-        ],
-        const SizedBox(
-          height: 10,
-        ),
-        if (widget.itemsVisibility != ShowedItemsVisibility.toggle &&
-            widget.isOverlay) ...[
-          Column(
-            children: [
-              CompositedTransformTarget(
-                link: _layerLink,
-                child: TapRegion(
-                  onTapInside: (event) {
-                    _overlayPortalController.show();
-                  },
-                  child: _searchField(
-                    maxItemsSelected: maxItemsSelected,
-                    onChanged: _onSearchFieldChanged,
-                  ),
-                ),
-              ),
-              _overlayedShowedItems(),
-            ],
-          ),
-        ],
-        if (widget.itemsVisibility != ShowedItemsVisibility.toggle &&
-            !widget.isOverlay) ...[
-          _searchField(
-            maxItemsSelected: maxItemsSelected,
-            onChanged: _onSearchFieldChanged,
-          ),
-          if (showAllItems)
-            Container(
-              constraints: BoxConstraints(
-                maxHeight: widget.maximumShowItemsHeight,
-              ),
-              decoration: widget.showedItemsBoxDecoration ??
-                  BoxDecoration(
-                    color: Colors.grey.withOpacity(0.1),
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey.withOpacity(0.5),
-                      ),
-                      left: BorderSide(
-                        color: Colors.grey.withOpacity(0.5),
-                      ),
-                      right: BorderSide(
-                        color: Colors.grey.withOpacity(0.5),
-                      ),
-                    ),
-                  ),
-              child: RawScrollbar(
-                controller: _showedItemsScrollController,
-                thumbColor: widget.showedItemsScrollbarColor,
-                thickness: widget.showedItemsScrollbarMinThumbLength ?? 10,
-                minThumbLength: widget.showedItemsScrollbarMinThumbLength ?? 30,
-                minOverscrollLength:
-                    widget.showedItemsScrollbarMinOverscrollLength ?? 5,
-                radius: widget.showedItemsScrollbarRadius ??
-                    const Radius.circular(5),
-                thumbVisibility: widget.showShowedItemsScrollbar,
-                child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context)
-                      .copyWith(scrollbars: false),
-                  child: _buildShowedItems(),
-                ),
-              ),
+            ..._pickedItemsBuilder(
+              context,
+              widget.placePickedItemContainerBelow == true,
             ),
-        ],
-        ..._pickedItemsBuilder(
-          context,
-          widget.placePickedItemContainerBelow == true,
+          ],
+        ),
+        ValueListenableBuilder<bool>(
+          valueListenable: isLoading,
+          builder: (context, value, child) {
+            if (!value) return const SizedBox.shrink();
+
+            return child!;
+          },
+          child: widget.loadingWidget ??
+              const Center(child: CircularProgressIndicator()),
         ),
       ],
     );
   }
 }
 
-/// This is the controller for the [MultipleSearchSelection].
+/// This is the controller for the [MultipleAsyncSearchSelection].
 ///
 /// Use this controller to :
 ///
@@ -1722,27 +1826,27 @@ class MultipleSearchController<T> {
     return getPickedItemsCallback?.call() ?? [];
   }
 
-  void _setClearSearchFieldCallback(Function()? callback) {
+  set _setClearSearchFieldCallback(Function()? callback) {
     clearSearchFieldCallback = callback;
   }
 
-  void _setGetAllItemsCallback(List<T> Function()? callback) {
+  set _setGetAllItemsCallback(List<T> Function()? callback) {
     getAllItemsCallback = callback;
   }
 
-  void _setSelectAllItemsCallback(Function()? callback) {
+  set _setSelectAllItemsCallback(Function()? callback) {
     selectAllItemsCallback = callback;
   }
 
-  void _setClearAllPickedItemsCallback(Function()? callback) {
+  set _setClearAllPickedItemsCallback(Function()? callback) {
     clearAllPickedItemsCallback = callback;
   }
 
-  void _setSearchItemsCallback(List<T> Function(String)? callback) {
+  set _setSearchItemsCallback(List<T> Function(String)? callback) {
     searchItemsCallback = callback;
   }
 
-  void _setGetPickedItemsCallback(List<T> Function()? callback) {
+  set _setGetPickedItemsCallback(List<T> Function()? callback) {
     getPickedItemsCallback = callback;
   }
 }

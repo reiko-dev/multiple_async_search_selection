@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:example/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:multiple_search_selection/multiple_search_selection.dart';
+import 'package:multiple_async_search_selection/multiple_async_search_selection.dart';
 
 class SelectableExample extends StatelessWidget {
   const SelectableExample({
@@ -18,7 +18,7 @@ class SelectableExample extends StatelessWidget {
     );
     return Column(
       children: [
-        MultipleSearchSelection<Country>(
+        MultipleAsyncSearchSelection<Country>(
           searchField: TextField(
             decoration: InputDecoration(
               hintText: 'Search countries',
@@ -33,8 +33,9 @@ class SelectableExample extends StatelessWidget {
               ),
             ),
           ),
-          onSearchChanged: (text) {
+          onSearchChanged: (text) async {
             log('Text is $text');
+            return [];
           },
           controller: controller,
           itemsVisibility: ShowedItemsVisibility.onType,
