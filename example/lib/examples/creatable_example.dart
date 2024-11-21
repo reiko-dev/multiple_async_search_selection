@@ -26,8 +26,15 @@ class _CreatableConstructorExampleState
   );
 
   final controller = MultipleSearchController<Country>();
+  final textFieldController = TextEditingController(
+    text: 'Joanna',
+  );
 
   late var countries = <Country>[];
+  late var initialItems = <Country>[
+    const Country(name: 'Brazil', iso: 'br'),
+    const Country(name: 'United States', iso: 'US'),
+  ];
 
   Future<List<Country>> loadCountries(String text) async {
     await Future.delayed(const Duration(milliseconds: 500));
@@ -48,6 +55,9 @@ class _CreatableConstructorExampleState
         return loadCountries(p0);
       },
       searchField: TextField(
+        enabled: false,
+        // readOnly: true,
+        controller: textFieldController,
         decoration: InputDecoration(
           hintText: 'Procure por cargos...',
           border: OutlineInputBorder(
@@ -57,6 +67,7 @@ class _CreatableConstructorExampleState
       ),
       createOptions: CreateOptions(
         create: (text) async {
+          await Future.delayed(const Duration(milliseconds: 2500));
           return Country(name: text, iso: text);
         },
         validator: (country) => country.name.length > 2,
@@ -78,6 +89,7 @@ class _CreatableConstructorExampleState
       },
       clearSearchFieldOnSelect: true,
       items: countries,
+      initialPickedItems: initialItems,
       fieldToCheck: (c) => c.name,
       itemBuilder: (country, index, isPicked) {
         return Container(

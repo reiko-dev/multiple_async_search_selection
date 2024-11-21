@@ -1746,16 +1746,19 @@ class _MultipleAsyncSearchSelectionState<T>
             ),
           ],
         ),
-        ValueListenableBuilder<bool>(
-          valueListenable: isLoading,
-          builder: (context, value, child) {
-            if (!value) return const SizedBox.shrink();
+        Positioned.fill(
+            child: IgnorePointer(
+          child: ValueListenableBuilder<bool>(
+            valueListenable: isLoading,
+            builder: (context, value, child) {
+              if (!value) return const SizedBox.shrink();
 
-            return child!;
-          },
-          child: widget.loadingWidget ??
-              const Center(child: CircularProgressIndicator()),
-        ),
+              return child!;
+            },
+            child: widget.loadingWidget ??
+                const Center(child: CircularProgressIndicator()),
+          ),
+        )),
       ],
     );
   }
