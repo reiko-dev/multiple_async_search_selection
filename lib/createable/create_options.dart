@@ -6,7 +6,7 @@ class CreateOptions<T> {
   /// You can create the item [T] with provided [text].
   ///
   /// If [T] is [String] just return the [text].
-  final T Function(String text) create;
+  final Future<T> Function(String text) create;
 
   /// This is the create item [Widget] builder.
   ///
